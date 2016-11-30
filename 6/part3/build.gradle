@@ -1,0 +1,76 @@
+buildscript {
+	ext {
+		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+	}
+	repositories {
+		mavenCentral()
+		maven { url "https://repo.spring.io/snapshot" }
+		maven { url "https://repo.spring.io/milestone" }
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+// tag::gradle-git[]
+plugins {
+	id "com.gorylenko.gradle-git-properties" version "1.4.17"
+}
+// end::gradle-git[]
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+
+jar {
+	baseName = 'learning-spring-boot'
+	version = '0.0.1-SNAPSHOT'
+}
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+	maven { url "https://repo.spring.io/snapshot" }
+	maven { url "https://repo.spring.io/milestone" }
+	maven { url "https://dl.bintray.com/rabbitmq/maven-milestones/" }
+}
+
+ext['reactor.version'] = '3.0.3.RELEASE'
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-actuator')
+	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
+	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+	compile('org.springframework.boot:spring-boot-devtools')
+
+	compile('org.springframework.boot:spring-boot-starter-web')
+
+	compile('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
+
+	compile("org.springframework.boot:spring-boot-devtools")
+
+	compile('org.projectlombok:lombok')
+
+	//compile('org.springframework.boot:spring-boot-starter-remote-shell')
+
+	/**
+	 * Prototype for Reactive Spring Data
+	 */
+//	compile "org.springframework.data:spring-data-commons:2.0.0.DATACMNS-836-SNAPSHOT"
+//	compile "org.springframework.data:spring-data-mongodb:2.0.0.DATAMONGO-1444-SNAPSHOT"
+//	compile "org.mongodb:mongodb-driver-reactivestreams:1.2.0"
+
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+//dependencyManagement {
+//	imports {
+//		mavenBom "org.springframework.boot.experimental:spring-boot-dependencies-web-reactive:0.1.0.BUILD-SNAPSHOT"
+//	}
+//}
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:Camden.BUILD-SNAPSHOT"
+	}
+}

@@ -1,0 +1,17 @@
+B05771*html
+index*html
+*.jar
+*.odt.styles
+*.fodt
+.~lock*
+.idea
+*.iml
+target
+*.csv
+*.tar.gz
+revised_fragment*
+build
+.gradle
+*.keystore
+.DS_Store
+upload-dir

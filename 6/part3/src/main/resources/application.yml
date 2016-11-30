@@ -1,0 +1,11 @@
+spring:
+  http:
+    multipart:
+      max-file-size: 10MB
+  cloud:
+    stream:
+      bindings:
+        input:
+          group: learning-spring-boot
+        output:
+          group: learning-spring-boot

@@ -1,0 +1,68 @@
+buildscript {
+	ext {
+		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+	}
+	repositories {
+		mavenCentral()
+		maven { url "https://repo.spring.io/snapshot" }
+		maven { url "https://repo.spring.io/milestone" }
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+//plugins {
+//	id "com.gorylenko.gradle-git-properties" version "1.4.17"
+//}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+	maven { url "https://repo.spring.io/snapshot" }
+	maven { url "https://repo.spring.io/milestone" }
+	maven { url "https://dl.bintray.com/rabbitmq/maven-milestones/" }
+}
+
+jar {
+	baseName = 'learning-spring-boot-images'
+	version = '0.0.1-SNAPSHOT'
+}
+
+ext['reactor.version'] = '3.0.3.RELEASE'
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-actuator')
+	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
+	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+	compile('org.springframework.boot:spring-boot-devtools')
+
+	compile('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
+	compile('org.springframework.cloud:spring-cloud-starter-eureka')
+	compile('org.springframework.cloud:spring-cloud-starter-hystrix')
+	compile('org.springframework.cloud:spring-cloud-starter-config')
+
+	compile('org.projectlombok:lombok')
+
+	// tag::websocket[]
+	compile('org.webjars:requirejs:2.2.0')
+	compile('org.webjars.npm:stompjs:2.3.3') {
+		exclude module: 'websocket' // We are using SockJS for websocket functionality
+	}
+	compile('org.webjars.bower:sockjs-client:1.1.0')
+	// end::websocket[]
+
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:Camden.SR2"
+	}
+}
