@@ -1,7 +1,0 @@
-spring:
-  application:
-    name: comments
-  cloud:
-    config:
-      label: session
-      password: password

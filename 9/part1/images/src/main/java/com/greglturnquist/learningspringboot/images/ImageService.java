@@ -35,6 +35,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 /**
@@ -82,7 +83,8 @@ public class ImageService {
 
 		if (!file.isEmpty()) {
 			Files.copy(file.getInputStream(),
-				Paths.get(UPLOAD_ROOT, file.getOriginalFilename()));
+				Paths.get(UPLOAD_ROOT, file.getOriginalFilename()),
+				StandardCopyOption.REPLACE_EXISTING);
 
 			repository.save(new Image(UUID.randomUUID().toString(),
 				file.getOriginalFilename()));

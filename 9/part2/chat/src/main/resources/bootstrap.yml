@@ -1,7 +1,0 @@
-spring:
-  application:
-    name: chat
-  cloud:
-    config:
-      label: session
-      password: password

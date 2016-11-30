@@ -1,6 +1,6 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+		springBootVersion = '1.4.2.RELEASE'
 	}
 	repositories {
 		mavenCentral()
@@ -40,7 +40,6 @@ ext['reactor.version'] = '3.0.3.RELEASE'
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
-	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
 	compile('org.springframework.boot:spring-boot-devtools')
 	compile('org.projectlombok:lombok')
 	compile('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
@@ -49,8 +48,23 @@ dependencies {
 	compile('org.springframework.cloud:spring-cloud-starter-config')
 	compile('org.springframework.boot:spring-boot-starter-websocket')
 
+	compile('org.webjars:requirejs:2.2.0')
+	compile('org.webjars.npm:stompjs:2.3.3') {
+		exclude module: 'websocket' // We are using SockJS for websocket functionality
+	}
+	compile('org.webjars.bower:sockjs-client:1.1.0')
+
 	compile('org.springframework.boot:spring-boot-starter-security')
+
+	//tag::websocket[]
 	compile('org.springframework.security:spring-security-messaging')
+	//end::websocket[]
+
+	compile('org.springframework.session:spring-session-data-mongo')
+
+	// tag::zuul[]
+	compile('org.springframework.cloud:spring-cloud-starter-zuul')
+	// end::zuul[]
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }

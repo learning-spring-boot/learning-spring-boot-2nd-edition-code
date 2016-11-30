@@ -19,23 +19,23 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 
 /**
  * @author Greg Turnquist
  */
-@Controller
+// tag::headline[]
+@RestController
 public class UploadController {
+	// end::headline[]
 
 	private static final String BASE_PATH = "/images";
 	private static final String FILENAME = "{filename:.+}";
@@ -47,7 +47,6 @@ public class UploadController {
 	}
 
 	@GetMapping(BASE_PATH + "/" + FILENAME + "/raw")
-	@ResponseBody
 	public ResponseEntity<?> oneRawImage(@PathVariable String filename) {
 
 		try {
@@ -64,31 +63,32 @@ public class UploadController {
 	}
 
 	@PostMapping(value = BASE_PATH)
-	public String createFile(@RequestParam("file") MultipartFile file,
-							 RedirectAttributes redirectAttributes) {
+	public ResponseEntity<?> createFile(@RequestParam("file") MultipartFile file) {
 		try {
 			imageService.createImage(file);
-			redirectAttributes.addFlashAttribute("flash.message",
+			return ResponseEntity.ok(
 				"Successfully uploaded " + file.getName());
 		} catch (IOException e) {
-			redirectAttributes.addFlashAttribute("flash.message",
+			return ResponseEntity.badRequest().body(
 				"Failed to upload " + file.getName() + " => " + e.getMessage());
 		}
-		return "redirect:/";
 	}
 
+	// tag::secured[]
+	//@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping(BASE_PATH + "/" + FILENAME)
-	public String deleteFile(@PathVariable String filename,
-							 RedirectAttributes redirectAttributes) {
+	public ResponseEntity<?> deleteFile(
+					@PathVariable String filename) {
 		try {
 			imageService.deleteImage(filename);
-			redirectAttributes.addFlashAttribute("flash.message",
+			return ResponseEntity.ok(
 				"Successfully deleted " + filename);
 		} catch (IOException|RuntimeException e) {
-			redirectAttributes.addFlashAttribute("flash.message",
-				"Failed to delete " + filename + " => " + e.getMessage());
+			return ResponseEntity.badRequest().body(
+				"Failed to delete " + filename + " => "
+									+ e.getMessage());
 		}
-		return "redirect:/";
 	}
+	// end::secured[]
 
 }

@@ -23,8 +23,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Greg Turnquist
@@ -45,7 +50,7 @@ public class HomeController {
 	// end::injection[]
 
 	@GetMapping("/")
-	public String index(Model model, Pageable pageable) {
+	public String index(Model model, Pageable pageable, HttpServletRequest request) {
 		final Page<Image> page = imageService.findPage(pageable);
 
 		model.addAttribute("page",
@@ -63,5 +68,11 @@ public class HomeController {
 			model.addAttribute("next", pageable.next());
 		}
 		return "index";
+	}
+
+	@GetMapping("/token")
+	@ResponseBody
+	public Map<String, String> token(HttpSession session) {
+		return Collections.singletonMap("token", session.getId());
 	}
 }

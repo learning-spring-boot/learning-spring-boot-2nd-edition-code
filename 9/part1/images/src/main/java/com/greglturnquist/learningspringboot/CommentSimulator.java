@@ -64,7 +64,8 @@ public class CommentSimulator {
 	public void simulateUsersClicking() {
 		homeController.index(
 			new BindingAwareModelMap(),
-			new PageRequest(0, 20));
+			new PageRequest(0, 20),
+			null);
 	}
 }
 // end::tag[]
