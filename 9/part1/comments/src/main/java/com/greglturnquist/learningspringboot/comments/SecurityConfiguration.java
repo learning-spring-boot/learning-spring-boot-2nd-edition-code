@@ -15,9 +15,11 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.session.SessionManagementFilter;
 
 /**
  * @author Greg Turnquist
@@ -26,9 +28,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+	@Autowired
+	SpringSessionSecurityContextFilter springSessionSecurityContextFilter;
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
+			.addFilterAfter(springSessionSecurityContextFilter, SessionManagementFilter.class)
 			.httpBasic()
 				.and()
 			.authorizeRequests()

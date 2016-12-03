@@ -13,22 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.greglturnquist.learningspringboot;
+package com.greglturnquist.learningspringboot.chat;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.session.data.mongo.JdkMongoSessionConverter;
-import org.springframework.session.data.mongo.config.annotation.web.http.EnableMongoHttpSession;
+import com.netflix.zuul.ZuulFilter;
+import com.netflix.zuul.context.RequestContext;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Greg Turnquist
  */
-@Configuration
-@EnableMongoHttpSession
-public class SessionConfig {
+@Component
+public class SessionHeaderLoadingZuulPreFilter extends ZuulFilter {
 
-	@Bean
-	public JdkMongoSessionConverter sessionConverter() {
-		return new JdkMongoSessionConverter();
+	@Override
+	public String filterType() {
+		return "pre";
 	}
+
+	@Override
+	public int filterOrder() {
+		return 0;
+	}
+
+	@Override
+	public boolean shouldFilter() {
+		return true;
+	}
+
+	@Override
+	public Object run() {
+		RequestContext context = RequestContext.getCurrentContext();
+
+		context.addZuulRequestHeader("SESSION",
+			context.getRequest().getSession().getId());
+
+		return null;
+	}
+
 }

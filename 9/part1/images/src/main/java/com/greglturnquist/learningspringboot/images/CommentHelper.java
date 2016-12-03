@@ -51,7 +51,7 @@ public class CommentHelper {
 
 	// tag::get-comments[]
 	@HystrixCommand(fallbackMethod = "defaultComments")
-	public List<Comment> getComments(Image image) {
+	public List<Comment> getComments(Image image, String sessionId) {
 
 		ResponseEntity<List<Comment>> results = restTemplate.exchange(
 			"http://COMMENTS/comments/{imageId}",
@@ -61,6 +61,7 @@ public class CommentHelper {
 					imagesConfiguration.getCommentsPassword();
 				String token = new String(Base64.encode(credentials.getBytes()));
 				set(AUTHORIZATION, "Basic " + token);
+				set("SESSION", sessionId);
 			}}),
 			new ParameterizedTypeReference<List<Comment>>() {},
 			image.getId());
@@ -69,7 +70,7 @@ public class CommentHelper {
 	// end::get-comments[]
 
 	// tag::fallback[]
-	public List<Comment> defaultComments(Image image) {
+	public List<Comment> defaultComments(Image image, String sessionId) {
 		return Collections.emptyList();
 	}
 	// end::fallback[]

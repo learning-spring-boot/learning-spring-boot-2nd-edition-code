@@ -23,9 +23,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,7 +50,8 @@ public class HomeController {
 	// end::injection[]
 
 	@GetMapping("/")
-	public String index(Model model, Pageable pageable, HttpServletRequest request) {
+	public String index(Model model, Pageable pageable,
+						@RequestHeader("SESSION") String sessionId) {
 		final Page<Image> page = imageService.findPage(pageable);
 
 		model.addAttribute("page",
@@ -58,7 +59,7 @@ public class HomeController {
 				put("id", image.getId());
 				put("name", image.getName());
 				// tag::comments[]
-				put("comments", commentHelper.getComments(image));
+				put("comments", commentHelper.getComments(image, sessionId));
 				// end::comments[]
 			}}));
 		if (page.hasPrevious()) {

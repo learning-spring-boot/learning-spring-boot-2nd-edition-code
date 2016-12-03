@@ -5,3 +5,15 @@ spring:
     config:
       label: session
       password: password
+zuul:
+  ribbon-isolation-strategy: thread
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 60000
+ribbon:
+  ConnectTimeout: 3000
+  ReadTimeout: 60000

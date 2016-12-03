@@ -19,6 +19,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -75,10 +76,10 @@ public class UploadController {
 	}
 
 	// tag::secured[]
-	//@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping(BASE_PATH + "/" + FILENAME)
 	public ResponseEntity<?> deleteFile(
-					@PathVariable String filename) {
+		@PathVariable String filename) {
 		try {
 			imageService.deleteImage(filename);
 			return ResponseEntity.ok(
