@@ -47,14 +47,15 @@ public class WebSocketConfig extends
 
 	// tag::secured-2[]
 	@Override
-	protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
+	protected void configureInbound(
+		MessageSecurityMetadataSourceRegistry messages) {
+
 		messages
 			.nullDestMatcher().authenticated()
 			.simpDestMatchers("/app/**").hasRole("USER")
 			.simpSubscribeDestMatchers(
 				"/user/**", "/topic/**").hasRole("USER")
 			.anyMessage().denyAll();
-
 	}
 	// end::secured-2[]
 }
