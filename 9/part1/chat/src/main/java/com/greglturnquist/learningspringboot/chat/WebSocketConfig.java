@@ -51,7 +51,8 @@ public class WebSocketConfig extends
 		messages
 			.nullDestMatcher().authenticated()
 			.simpDestMatchers("/app/**").hasRole("USER")
-			.simpSubscribeDestMatchers("/user/**", "/topic/**").hasRole("USER")
+			.simpSubscribeDestMatchers(
+				"/user/**", "/topic/**").hasRole("USER")
 			.anyMessage().denyAll();
 
 	}

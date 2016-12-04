@@ -38,14 +38,17 @@ public class SecurityConfiguration extends
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
-			.addFilterAfter(springSessionSecurityContextFilter, SessionManagementFilter.class)
 			.httpBasic()
 				.disable()
 			.authorizeRequests()
-				.anyRequest().authenticated();
+				.anyRequest().authenticated()
+				.and()
+			.addFilterAfter(springSessionSecurityContextFilter,
+				SessionManagementFilter.class);
 	}
 
 	@Autowired
-	SpringSessionSecurityContextFilter springSessionSecurityContextFilter;
+	SpringSessionSecurityContextFilter
+		springSessionSecurityContextFilter;
 }
 // end::code[]

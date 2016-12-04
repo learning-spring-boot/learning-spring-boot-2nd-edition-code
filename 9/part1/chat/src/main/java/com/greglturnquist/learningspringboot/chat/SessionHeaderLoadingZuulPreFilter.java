@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author Greg Turnquist
  */
+// tag::code[]
 @Component
 public class SessionHeaderLoadingZuulPreFilter extends ZuulFilter {
 
@@ -49,5 +50,5 @@ public class SessionHeaderLoadingZuulPreFilter extends ZuulFilter {
 
 		return null;
 	}
-
 }
+// end::code[]

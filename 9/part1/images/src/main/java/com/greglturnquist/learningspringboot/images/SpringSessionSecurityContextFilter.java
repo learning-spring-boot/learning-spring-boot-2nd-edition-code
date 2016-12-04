@@ -16,7 +16,6 @@
 package com.greglturnquist.learningspringboot.images;
 
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
 import org.springframework.stereotype.Component;
@@ -28,32 +27,40 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.*;
+
 /**
  * @author Greg Turnquist
  */
+// tag::code[]
 @Component
-public class SpringSessionSecurityContextFilter extends OncePerRequestFilter {
+public class SpringSessionSecurityContextFilter
+	extends OncePerRequestFilter {
 
 	private final SessionRepository sessionRepository;
 
-	public SpringSessionSecurityContextFilter(SessionRepository sessionRepository) {
+	public SpringSessionSecurityContextFilter(
+		SessionRepository sessionRepository) {
+
 		this.sessionRepository = sessionRepository;
 	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request,
 									HttpServletResponse response,
-									FilterChain filterChain) throws ServletException, IOException {
+									FilterChain filterChain)
+							throws ServletException, IOException {
 		String sessionId = request.getHeader("SESSION");
 		if (sessionId != null) {
-			Session session = sessionRepository.getSession(sessionId);
+			Session session =
+				sessionRepository.getSession(sessionId);
 			if (session != null) {
 				SecurityContextHolder.setContext(
 					session.getAttribute(
-						HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY));
+						SPRING_SECURITY_CONTEXT_KEY));
 			}
 		}
 		filterChain.doFilter(request, response);
 	}
-
 }
+// end::code[]
