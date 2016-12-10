@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.greglturnquist.learningspringboot.images;
+package com.greglturnquist.learningspringboot.chat;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
 /**
@@ -26,10 +26,12 @@ import org.springframework.data.annotation.Id;
 // tag::code[]
 @Data
 @AllArgsConstructor
-public class Image {
+@NoArgsConstructor
+public class User {
 
-	@Id private String id;
-	private String name;
-	private String owner;
+	@Id  private String id;
+	private String username;
+	private String password;
+	private String[] roles;
 }
 // end::code[]

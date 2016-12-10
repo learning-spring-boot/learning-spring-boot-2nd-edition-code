@@ -54,14 +54,15 @@ public class HomeController {
 						@RequestHeader("SESSION") String sessionId) {
 		final Page<Image> page = imageService.findPage(pageable);
 
+		// tag::owner[]
 		model.addAttribute("page",
 			page.map(image -> new HashMap<String, Object>(){{
 				put("id", image.getId());
 				put("name", image.getName());
-				// tag::comments[]
+				put("owner", image.getOwner());
 				put("comments", commentHelper.getComments(image, sessionId));
-				// end::comments[]
 			}}));
+		// end::owner[]
 		if (page.hasPrevious()) {
 			model.addAttribute("prev", pageable.previousOrFirst());
 		}

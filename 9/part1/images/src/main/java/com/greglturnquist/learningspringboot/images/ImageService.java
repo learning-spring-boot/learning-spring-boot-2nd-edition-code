@@ -26,6 +26,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
@@ -50,7 +51,6 @@ public class ImageService {
 	private final ImageRepository repository;
 	private final ResourceLoader resourceLoader;
 
-// tag::metric-1[]
 	private final CounterService counterService;
 	private final GaugeService gaugeService;
 	private final InMemoryMetricRepository inMemoryMetricRepository;
@@ -68,7 +68,6 @@ public class ImageService {
 		this.gaugeService = gaugeService;
 		this.inMemoryMetricRepository = inMemoryMetricRepository;
 	}
-// end::metric-1[]
 
 	public Page<Image> findPage(Pageable pageable) {
 		return repository.findAll(pageable);
@@ -79,7 +78,6 @@ public class ImageService {
 		return resourceLoader.getResource("file:" + UPLOAD_ROOT + "/" + filename);
 	}
 
-	// tag::metric-2[]
 	public void createImage(MultipartFile file) throws IOException {
 
 		if (!file.isEmpty()) {
@@ -87,8 +85,12 @@ public class ImageService {
 				Paths.get(UPLOAD_ROOT, file.getOriginalFilename()),
 				StandardCopyOption.REPLACE_EXISTING);
 
-			repository.save(new Image(UUID.randomUUID().toString(),
-				file.getOriginalFilename()));
+			// tag::secured[]
+			repository.save(new Image(
+				UUID.randomUUID().toString(),
+				file.getOriginalFilename(),
+				SecurityContextHolder.getContext().getAuthentication().getName()));
+			// end::secured[]
 
 			counterService.increment("files.uploaded");
 
@@ -100,14 +102,17 @@ public class ImageService {
 					file.getSize()));
 		}
 	}
-	// end::metric-2[]
 
+	// tag::secured-2[]
+	@PreAuthorize("hasRole('ADMIN') " +
+		"or @imageRepository.findByName(#filename).owner == authentication.name")
 	public void deleteImage(String filename) throws IOException {
 
 		final Image byName = repository.findByName(filename);
 		repository.delete(byName);
 		Files.deleteIfExists(Paths.get(UPLOAD_ROOT, filename));
 	}
+	// end::secured-2[]
 
 	@Bean
 	CommandLineRunner setUp(ImageRepository repository) throws IOException {
@@ -120,13 +125,13 @@ public class ImageService {
 			repository.deleteAll();
 
 			FileCopyUtils.copy("Test file", new FileWriter(UPLOAD_ROOT + "/test"));
-			repository.save(new Image(UUID.randomUUID().toString(), "test"));
+			repository.save(new Image(UUID.randomUUID().toString(), "test", "greg"));
 
 			FileCopyUtils.copy("Test file2", new FileWriter(UPLOAD_ROOT + "/test2"));
-			repository.save(new Image(UUID.randomUUID().toString(), "test2"));
+			repository.save(new Image(UUID.randomUUID().toString(), "test2", "greg"));
 
 			FileCopyUtils.copy("Test file3", new FileWriter(UPLOAD_ROOT + "/test3"));
-			repository.save(new Image(UUID.randomUUID().toString(), "test3"));
+			repository.save(new Image(UUID.randomUUID().toString(), "test3", "greg"));
 		};
 
 	}

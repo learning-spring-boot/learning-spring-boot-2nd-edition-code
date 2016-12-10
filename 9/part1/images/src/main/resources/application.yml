@@ -1,5 +1,6 @@
 logging:
   level:
-    org.springframework:
-      security: DEBUG
-      session: TRACE
+    org:
+      springframework:
+        security: DEBUG
+        session: TRACE
