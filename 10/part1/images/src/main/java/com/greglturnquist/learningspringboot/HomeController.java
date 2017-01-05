@@ -58,9 +58,8 @@ public class HomeController {
 			page.map(image -> new HashMap<String, Object>(){{
 				put("id", image.getId());
 				put("name", image.getName());
-				// tag::comments[]
+				put("owner", image.getOwner());
 				put("comments", commentHelper.getComments(image, sessionId));
-				// end::comments[]
 			}}));
 		if (page.hasPrevious()) {
 			model.addAttribute("prev", pageable.previousOrFirst());

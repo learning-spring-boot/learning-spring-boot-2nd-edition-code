@@ -15,11 +15,12 @@
  */
 package com.greglturnquist.learningspringboot.images;
 
+import java.io.IOException;
+
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,8 +28,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 /**
  * @author Greg Turnquist
@@ -75,8 +74,6 @@ public class UploadController {
 		}
 	}
 
-	// tag::secured[]
-	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping(BASE_PATH + "/" + FILENAME)
 	public ResponseEntity<?> deleteFile(
 		@PathVariable String filename) {
@@ -90,6 +87,5 @@ public class UploadController {
 									+ e.getMessage());
 		}
 	}
-	// end::secured[]
 
 }

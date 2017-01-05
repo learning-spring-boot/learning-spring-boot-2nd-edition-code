@@ -13,23 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.greglturnquist.learningspringboot.images;
+package com.greglturnquist.learningspringboot.chat;
 
-import org.springframework.data.annotation.Id;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import org.springframework.data.repository.CrudRepository;
 
 /**
  * @author Greg Turnquist
  */
 // tag::code[]
-@Data
-@AllArgsConstructor
-public class Image {
+public interface UserRepository extends CrudRepository<User, String> {
 
-	@Id private String id;
-	private String name;
-	private String owner;
+	User findByUsername(String username);
 }
 // end::code[]

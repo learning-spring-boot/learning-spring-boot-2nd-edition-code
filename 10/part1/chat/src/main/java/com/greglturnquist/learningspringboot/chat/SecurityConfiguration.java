@@ -16,20 +16,12 @@
 package com.greglturnquist.learningspringboot.chat;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.session.SessionManagementFilter;
-import org.springframework.session.data.mongo.JdkMongoSessionConverter;
-import org.springframework.session.data.mongo.config.annotation.web.http.EnableMongoHttpSession;
-import org.springframework.session.web.http.CookieHttpSessionStrategy;
-import org.springframework.session.web.http.HeaderHttpSessionStrategy;
-import org.springframework.session.web.http.HttpSessionStrategy;
 
 /**
  * @author Greg Turnquist
@@ -39,23 +31,37 @@ import org.springframework.session.web.http.HttpSessionStrategy;
 public class SecurityConfiguration extends
 				WebSecurityConfigurerAdapter {
 
+	// tag::mongdb-users[]
 	@Autowired
-	public void globalUserDetails(AuthenticationManagerBuilder auth)
+	public void globalUserDetails(AuthenticationManagerBuilder auth,
+					  SpringDataUserDetailsService userDetailsService)
 		throws Exception {
-		auth.inMemoryAuthentication()
-			.withUser("greg").password("turnquist")
-				.roles("USER", "ADMIN")
-			.and()
-			.withUser("phil").password("webb").roles("USER");
+
+		auth.userDetailsService(userDetailsService);
 	}
+
+	@Bean
+	CommandLineRunner initializeUsers(UserRepository repository) {
+		return args -> {
+			repository.save(new User(null, "greg", "turnquist",
+				new String[]{"ROLE_USER", "ROLE_ADMIN"}));
+
+			repository.save(new User(null, "phil", "webb",
+				new String[]{"ROLE_USER"}));
+		};
+	}
+	// end::mongodb-users[]
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
 			.httpBasic()
 				.and()
+			.formLogin()
+				.and()
 			.authorizeRequests()
 				.antMatchers("/**").authenticated();
 	}
+
 }
 // end::code[]
