@@ -17,8 +17,9 @@ package com.greglturnquist.learningspringboot.chat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;
 import org.springframework.security.config.annotation.web.socket.AbstractSecurityWebSocketMessageBrokerConfigurer;
@@ -28,35 +29,84 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 /**
  * @author Greg Turnquist
  */
-// tag::secured-1[]
+// tag::intro[]
 @Configuration
-@EnableWebSocketMessageBroker
-public class WebSocketConfig extends
-	AbstractSecurityWebSocketMessageBrokerConfigurer {
-	// end::secured-1[]
+public class WebSocketConfig {
+// end::intro[]
 
-	private static final Logger log = LoggerFactory.getLogger(WebSocketConfig.class);
+	// tag::cloud-1[]
+	@Profile("cloud")
+	@Configuration
+	@EnableConfigurationProperties(ChatConfigProperties.class)
+	@EnableWebSocketMessageBroker
+	static class CloudBasedWebSocketConfig extends AbstractSecurityWebSocketMessageBrokerConfigurer {
+	// end::cloud-1[]
 
-	@Value("https://${vcap.application.uris[0]}")
-	String origin;
+		private static final Logger log = LoggerFactory.getLogger(CloudBasedWebSocketConfig.class);
 
-	// tag::cors[]
-	@Override
-	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		log.warn("!!! Configuring allow origin of " + origin);
-		registry.addEndpoint("/learning-spring-boot").setAllowedOrigins(origin).withSockJS();
+		// tag::cloud-2[]
+		private final ChatConfigProperties chatConfigProperties;
+
+		CloudBasedWebSocketConfig(ChatConfigProperties chatConfigProperties) {
+			this.chatConfigProperties = chatConfigProperties;
+		}
+		// end::cloud-2[]
+
+		// tag::cors[]
+		@Override
+		public void registerStompEndpoints(StompEndpointRegistry registry) {
+			registry.addEndpoint("/learning-spring-boot")
+				.setAllowedOrigins(chatConfigProperties.getOrigin())
+				.withSockJS();
+		}
+		// end::cors[]
+
+		@Override
+		public void configureMessageBroker(MessageBrokerRegistry registry) {
+			registry.setApplicationDestinationPrefixes("/app");
+			registry.enableSimpleBroker("/topic", "/queue");
+		}
+
+		@Override
+		protected void configureInbound(
+			MessageSecurityMetadataSourceRegistry messages) {
+
+			configureMessageSecurity(messages);
+		}
 	}
-	// end::cors[]
 
-	@Override
-	public void configureMessageBroker(MessageBrokerRegistry registry) {
-		registry.setApplicationDestinationPrefixes("/app");
-		registry.enableSimpleBroker("/topic", "/queue");
+	// tag::websocket-non-cloud[]
+	@Profile("!cloud")
+	@Configuration
+	@EnableWebSocketMessageBroker
+	static class LocalWebSocketConfig extends AbstractSecurityWebSocketMessageBrokerConfigurer {
+	// end::websocket-non-cloud[]
+
+		private static final Logger log = LoggerFactory.getLogger(LocalWebSocketConfig.class);
+
+		@Override
+		public void registerStompEndpoints(StompEndpointRegistry registry) {
+			registry.addEndpoint("/learning-spring-boot").withSockJS();
+		}
+
+		@Override
+		public void configureMessageBroker(MessageBrokerRegistry registry) {
+			registry.setApplicationDestinationPrefixes("/app");
+			registry.enableSimpleBroker("/topic", "/queue");
+		}
+
+		// tag::non-cloud-configure-inbound[]
+		@Override
+		protected void configureInbound(
+			MessageSecurityMetadataSourceRegistry messages) {
+
+			configureMessageSecurity(messages);
+		}
+		// end::non-cloud-configure-inbound[]
 	}
 
-	// tag::secured-2[]
-	@Override
-	protected void configureInbound(
+	// tag::configure-message-security[]
+	private static void configureMessageSecurity(
 		MessageSecurityMetadataSourceRegistry messages) {
 
 		messages
@@ -66,6 +116,5 @@ public class WebSocketConfig extends
 				"/user/**", "/topic/**").hasRole("USER")
 			.anyMessage().denyAll();
 	}
-	// end::secured-2[]
-
+	// end::configure-message-security[]
 }
