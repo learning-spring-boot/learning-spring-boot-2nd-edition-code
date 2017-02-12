@@ -58,17 +58,20 @@ public class HomeController {
 	// tag::2[]
 	@GetMapping(BASE_PATH + "/" + FILENAME + "/raw")
 	@ResponseBody
-	public Mono<ResponseEntity<?>> oneRawImage(@PathVariable String filename) {
+	public Mono<ResponseEntity<?>> oneRawImage(
+								@PathVariable String filename) {
 		return imageService.findOneImage(filename)
 			.map(resource -> {
 				try {
 					return ResponseEntity.ok()
 						.contentLength(resource.contentLength())
 						.contentType(MediaType.IMAGE_JPEG)
-						.body(new InputStreamResource(resource.getInputStream()));
+						.body(new InputStreamResource(
+							resource.getInputStream()));
 				} catch (IOException e) {
 					return ResponseEntity.badRequest()
-						.body("Couldn't find " + filename + " => " + e.getMessage());
+						.body("Couldn't find " + filename +
+							" => " + e.getMessage());
 				}
 			});
 	}

@@ -77,7 +77,8 @@ public class ExampleTests {
 			.groupBy(String::toString)
 			.sort((o1, o2) -> o1.key().compareTo(o2.key()))
 			.flatMap(group -> Mono.just(group.key()).and(group.count()))
-			.map(keyAndCount -> keyAndCount.getT1() + " => " + keyAndCount.getT2())
+			.map(keyAndCount ->
+				keyAndCount.getT1() + " => " + keyAndCount.getT2())
 			.subscribe(System.out::println);
 		// end::6[]
 	}

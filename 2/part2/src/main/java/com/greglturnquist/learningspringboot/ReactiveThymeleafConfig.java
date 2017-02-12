@@ -35,29 +35,35 @@ public class ReactiveThymeleafConfig {
 
 	private ThymeleafProperties thymeleafProperties;
 
-	public ReactiveThymeleafConfig(ThymeleafProperties thymeleafProperties) {
+	public ReactiveThymeleafConfig(ThymeleafProperties
+									   thymeleafProperties) {
 		this.thymeleafProperties = thymeleafProperties;
 	}
 	// end::1[]
 
 	// tag::2[]
 	@Bean
-	public SpringResourceTemplateResolver thymeleafTemplateResolver(ApplicationContext applicationContext) {
+	public SpringResourceTemplateResolver thymeleafTemplateResolver(
+		ApplicationContext applicationContext) {
 
-		final SpringResourceTemplateResolver resolver = new SpringResourceTemplateResolver();
+		final SpringResourceTemplateResolver resolver =
+			new SpringResourceTemplateResolver();
 		resolver.setApplicationContext(applicationContext);
 		resolver.setPrefix(this.thymeleafProperties.getPrefix());
 		resolver.setSuffix(this.thymeleafProperties.getSuffix());
 		resolver.setTemplateMode(this.thymeleafProperties.getMode());
 		if (this.thymeleafProperties.getEncoding() != null) {
-			resolver.setCharacterEncoding(this.thymeleafProperties.getEncoding().name());
+			resolver.setCharacterEncoding(
+				this.thymeleafProperties.getEncoding().name());
 		}
 		resolver.setCacheable(this.thymeleafProperties.isCache());
-		final Integer order = this.thymeleafProperties.getTemplateResolverOrder();
+		final Integer order =
+			this.thymeleafProperties.getTemplateResolverOrder();
 		if (order != null) {
 			resolver.setOrder(order);
 		}
-		resolver.setCheckExistence(this.thymeleafProperties.isCheckTemplate());
+		resolver.setCheckExistence(
+			this.thymeleafProperties.isCheckTemplate());
 
 		return resolver;
 	}
@@ -66,8 +72,10 @@ public class ReactiveThymeleafConfig {
 	// tag::3[]
 	@Bean
 	public ISpringWebReactiveTemplateEngine thymeleafTemplateEngine(
-		SpringResourceTemplateResolver templateResolver){
-		final SpringWebReactiveTemplateEngine templateEngine = new SpringWebReactiveTemplateEngine();
+		SpringResourceTemplateResolver templateResolver) {
+
+		final SpringWebReactiveTemplateEngine templateEngine =
+			new SpringWebReactiveTemplateEngine();
 		templateEngine.setTemplateResolver(templateResolver);
 		return templateEngine;
 	}
@@ -77,7 +85,9 @@ public class ReactiveThymeleafConfig {
 	@Bean
 	public ThymeleafReactiveViewResolver thymeleafFullModeViewResolver(
 		ISpringWebReactiveTemplateEngine templateEngine){
-		final ThymeleafReactiveViewResolver viewResolver = new ThymeleafReactiveViewResolver();
+
+		final ThymeleafReactiveViewResolver viewResolver =
+			new ThymeleafReactiveViewResolver();
 		viewResolver.setTemplateEngine(templateEngine);
 		viewResolver.setResponseMaxChunkSizeBytes(16384);
 		return viewResolver;

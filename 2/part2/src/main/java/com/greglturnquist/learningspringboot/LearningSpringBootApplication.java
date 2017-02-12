@@ -9,7 +9,8 @@ import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfigurati
 public class LearningSpringBootApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(LearningSpringBootApplication.class, args);
+		SpringApplication.run(
+			LearningSpringBootApplication.class, args);
 	}
 }
 // end::code[]
