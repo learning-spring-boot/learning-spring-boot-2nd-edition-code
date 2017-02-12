@@ -2,6 +2,9 @@ rootProject.name = 'learning-spring-boot'
 
 include '1/part1'
 
+include '2/part1'
+include '2/part2'
+
 include '3/part1'
 
 include '5/part1'
