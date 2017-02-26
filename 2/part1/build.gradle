@@ -41,7 +41,7 @@ repositories {
 ext['thymeleaf.version'] = thymeleafVersion
 
 dependencies {
-	compile('org.springframework.boot.experimental:spring-boot-starter-web-reactive')
+	compile('org.springframework.boot:spring-boot-starter-webflux')
 	compile("org.thymeleaf:thymeleaf-spring5:${thymeleafVersion}")
 	compile('org.projectlombok:lombok')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
@@ -49,8 +49,7 @@ dependencies {
 
 dependencyManagement {
 	imports {
-		mavenBom "org.springframework.boot.experimental:spring-boot-dependencies-web-reactive:0.1.0.BUILD-SNAPSHOT"
-		mavenBom "io.projectreactor:reactor-bom:Aluminium-RELEASE"
+		mavenBom "io.projectreactor:reactor-bom:Aluminium-SR1"
 	}
 }
 // end::deps[]

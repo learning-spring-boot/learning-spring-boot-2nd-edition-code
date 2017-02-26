@@ -6,6 +6,7 @@ include '2/part1'
 include '2/part2'
 
 include '3/part1'
+include '3/part2'
 
 include '5/part1'
 include '5/part2'

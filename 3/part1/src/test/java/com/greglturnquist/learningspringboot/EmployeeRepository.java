@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,35 +15,15 @@
  */
 package com.greglturnquist.learningspringboot;
 
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+
 /**
  * @author Greg Turnquist
  */
-public class Chapter {
+// tag::code[]
+public interface EmployeeRepository extends
+	ReactiveCrudRepository<Employee, String>,
+	ReactiveQueryByExampleExecutor<Employee> {
 
-	private String id;
-
-	private String title;
-
-	private Chapter() { }
-
-	public Chapter(String id, String title) {
-		this.id = id;
-		this.title = title;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
 }
+// end::code[]
