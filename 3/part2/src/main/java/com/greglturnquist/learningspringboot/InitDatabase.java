@@ -42,11 +42,11 @@ public class InitDatabase implements CommandLineRunner {
 			.then(() -> Mono.when(
 					repository.save(
 						new Image("1",
-							"learning-spring-boot.png"))
+							"learning-spring-boot-cover.jpg"))
 						.log("initDatabase"),
 					repository.save(
 						new Image("2",
-							"learning-spring-boot-2nd-edition.png"))
+							"learning-spring-boot-2nd-edition-cover.jpg"))
 						.log("initDatabase"),
 					repository.save(
 						new Image("3",
@@ -57,7 +57,8 @@ public class InitDatabase implements CommandLineRunner {
 			.then(() -> repository.findAll().collectList())
 			.log("initDatabase")
 			.then(images -> {
-				images.forEach(image -> System.out.println(image.toString()));
+				images.forEach(image ->
+					System.out.println(image.toString()));
 				return Mono.empty();
 			})
 			.log("initDatabase")

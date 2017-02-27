@@ -41,8 +41,7 @@ ext['thymeleaf.version'] = thymeleafVersion
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')
 	// tag::dep-1[]
-	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
-	compile('org.mongodb:mongodb-driver-reactivestreams')
+	compile('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
 	// end::dep-1[]
 	compile("org.thymeleaf:thymeleaf-spring5:${thymeleafVersion}")
 	compile('org.projectlombok:lombok')
@@ -53,7 +52,5 @@ dependencies {
 dependencyManagement {
 	imports {
 		mavenBom "io.projectreactor:reactor-bom:Aluminium-SR1"
-		// tag::dep-2[]
-		// end::dep-2[]
 	}
 }

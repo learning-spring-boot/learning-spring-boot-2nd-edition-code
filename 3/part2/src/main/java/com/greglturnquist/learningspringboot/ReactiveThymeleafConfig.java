@@ -21,6 +21,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.web.reactive.result.view.UrlBasedViewResolver;
 import org.thymeleaf.spring5.ISpringWebReactiveTemplateEngine;
 import org.thymeleaf.spring5.SpringWebReactiveTemplateEngine;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;

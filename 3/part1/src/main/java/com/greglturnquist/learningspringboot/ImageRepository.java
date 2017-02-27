@@ -22,7 +22,8 @@ import reactor.core.publisher.Mono;
  * @author Greg Turnquist
  */
 // tag::code[]
-public interface ImageRepository extends ReactiveCrudRepository<Image, String> {
+public interface ImageRepository
+	extends ReactiveCrudRepository<Image, String> {
 
 	Mono<Image> findByName(String name);
 }

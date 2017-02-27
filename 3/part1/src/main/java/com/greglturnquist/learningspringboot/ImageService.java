@@ -46,7 +46,8 @@ public class ImageService {
 
 	private final ImageRepository imageRepository;
 
-	public ImageService(ResourceLoader resourceLoader, ImageRepository imageRepository) {
+	public ImageService(ResourceLoader resourceLoader,
+						ImageRepository imageRepository) {
 		this.resourceLoader = resourceLoader;
 		this.imageRepository = imageRepository;
 	}

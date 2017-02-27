@@ -51,7 +51,8 @@ public class InitDatabase implements CommandLineRunner {
 				))
 			.then(() -> repository.findAll().collectList())
 			.then(images -> {
-				images.forEach(image -> System.out.println(image.toString()));
+				images.forEach(image ->
+					System.out.println(image.toString()));
 				return Mono.empty();
 			})
 			.block(Duration.ofSeconds(30));
