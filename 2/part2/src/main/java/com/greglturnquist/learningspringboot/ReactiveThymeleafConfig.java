@@ -20,8 +20,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.thymeleaf.spring5.ISpringWebReactiveTemplateEngine;
-import org.thymeleaf.spring5.SpringWebReactiveTemplateEngine;
+
+import org.thymeleaf.spring5.SpringWebFluxTemplateEngine;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring5.view.reactive.ThymeleafReactiveViewResolver;
 
@@ -71,11 +71,11 @@ public class ReactiveThymeleafConfig {
 
 	// tag::3[]
 	@Bean
-	public ISpringWebReactiveTemplateEngine thymeleafTemplateEngine(
+	public SpringWebFluxTemplateEngine thymeleafTemplateEngine(
 		SpringResourceTemplateResolver templateResolver) {
 
-		final SpringWebReactiveTemplateEngine templateEngine =
-			new SpringWebReactiveTemplateEngine();
+		final SpringWebFluxTemplateEngine templateEngine =
+			new SpringWebFluxTemplateEngine();
 		templateEngine.setTemplateResolver(templateResolver);
 		return templateEngine;
 	}
@@ -84,7 +84,7 @@ public class ReactiveThymeleafConfig {
 	// tag::4[]
 	@Bean
 	public ThymeleafReactiveViewResolver thymeleafFullModeViewResolver(
-		ISpringWebReactiveTemplateEngine templateEngine){
+		SpringWebFluxTemplateEngine templateEngine){
 
 		final ThymeleafReactiveViewResolver viewResolver =
 			new ThymeleafReactiveViewResolver();

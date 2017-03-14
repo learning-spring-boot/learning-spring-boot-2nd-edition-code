@@ -12,9 +12,13 @@ buildscript {
 	}
 }
 
-//plugins {
-//	id "com.gorylenko.gradle-git-properties" version "1.4.17"
-//}
+plugins {
+	id "io.spring.dependency-management" version "1.0.0.RC2"
+
+	// tag::gradle-git[]
+	id "com.gorylenko.gradle-git-properties" version "1.4.17"
+	// end::gradle-git[]
+}
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -39,7 +43,7 @@ ext['reactor.version'] = '3.0.3.RELEASE'
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
-	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+	compile('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
 	compile('org.springframework.boot:spring-boot-devtools')
 
 	compile('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
@@ -54,6 +58,7 @@ dependencies {
 
 dependencyManagement {
 	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:Camden.SR2"
+		mavenBom "io.projectreactor:reactor-bom:Aluminium-SR1"
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:Dalston.BUILD-SNAPSHOT"
 	}
 }

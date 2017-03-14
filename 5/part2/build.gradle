@@ -1,6 +1,7 @@
 buildscript {
 	ext {
 		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+		thymeleafVersion = '3.0.4-SNAPSHOT'
 	}
 	repositories {
 		mavenCentral()
@@ -12,11 +13,13 @@ buildscript {
 	}
 }
 
-// tag::gradle-git[]
 plugins {
+	id "io.spring.dependency-management" version "1.0.0.RC2"
+
+	// tag::gradle-git[]
 	id "com.gorylenko.gradle-git-properties" version "1.4.17"
+	// end::gradle-git[]
 }
-// end::gradle-git[]
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -33,45 +36,32 @@ repositories {
 	mavenCentral()
 	maven { url "https://repo.spring.io/snapshot" }
 	maven { url "https://repo.spring.io/milestone" }
+	maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 
-ext['reactor.version'] = '3.0.3.RELEASE'
+ext['thymeleaf.version'] = thymeleafVersion
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
-	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
-	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+	compile('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
+	compile("org.thymeleaf:thymeleaf-spring5:${thymeleafVersion}")
 	compile('org.springframework.boot:spring-boot-devtools')
 
 	// tag::undertow[]
-	// TODO: Switch back to Reactive Web when Actuator support is added.
-	//	compile('org.springframework.boot.experimental:spring-boot-starter-web-reactive') {
-	//		exclude module: 'spring-boot-starter-tomcat'
-	//	}
-	compile('org.springframework.boot:spring-boot-starter-web') {
-		exclude module: 'spring-boot-starter-tomcat'
+	compile('org.springframework.boot:spring-boot-starter-webflux') {
+		exclude module: 'spring-boot-starter-reactor-netty'
 	}
 	compile('org.springframework.boot:spring-boot-starter-undertow')
 	// end::undertow[]
 
-	compile("org.springframework.boot:spring-boot-devtools")
-
 	compile('org.projectlombok:lombok')
 
-	//compile('org.springframework.boot:spring-boot-starter-remote-shell')
-
-	/**
-	 * Prototype for Reactive Spring Data
-	 */
-//	compile "org.springframework.data:spring-data-commons:2.0.0.DATACMNS-836-SNAPSHOT"
-//	compile "org.springframework.data:spring-data-mongodb:2.0.0.DATAMONGO-1444-SNAPSHOT"
-//	compile "org.mongodb:mongodb-driver-reactivestreams:1.2.0"
-
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile("io.projectreactor.addons:reactor-test")
 }
 
-//dependencyManagement {
-//	imports {
-//		mavenBom "org.springframework.boot.experimental:spring-boot-dependencies-web-reactive:0.1.0.BUILD-SNAPSHOT"
-//	}
-//}
+dependencyManagement {
+	imports {
+		mavenBom "io.projectreactor:reactor-bom:Aluminium-SR1"
+	}
+}

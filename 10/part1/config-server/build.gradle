@@ -12,9 +12,13 @@ buildscript {
 	}
 }
 
-//plugins {
-//	id "com.gorylenko.gradle-git-properties" version "1.4.17"
-//}
+plugins {
+	id "io.spring.dependency-management" version "1.0.0.RC2"
+
+	// tag::gradle-git[]
+	id "com.gorylenko.gradle-git-properties" version "1.4.17"
+	// end::gradle-git[]
+}
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -45,7 +49,7 @@ dependencies {
 
 dependencyManagement {
 	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:Camden.SR2"
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:Dalston.BUILD-SNAPSHOT"
 	}
 }
 // end::code[]

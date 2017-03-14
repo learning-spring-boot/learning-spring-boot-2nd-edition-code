@@ -1,6 +1,7 @@
 buildscript {
 	ext {
 		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+		thymeleafVersion = '3.0.4-SNAPSHOT'
 	}
 	repositories {
 		mavenCentral()
@@ -12,9 +13,13 @@ buildscript {
 	}
 }
 
-//plugins {
-//	id "com.gorylenko.gradle-git-properties" version "1.4.17"
-//}
+plugins {
+	id "io.spring.dependency-management" version "1.0.0.RC2"
+
+	// tag::gradle-git[]
+	id "com.gorylenko.gradle-git-properties" version "1.4.17"
+	// end::gradle-git[]
+}
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -27,6 +32,7 @@ repositories {
 	mavenCentral()
 	maven { url "https://repo.spring.io/snapshot" }
 	maven { url "https://repo.spring.io/milestone" }
+	maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 	maven { url "https://dl.bintray.com/rabbitmq/maven-milestones/" }
 }
 
@@ -35,12 +41,13 @@ jar {
 	version = '0.0.1-SNAPSHOT'
 }
 
-ext['reactor.version'] = '3.0.3.RELEASE'
+ext['thymeleaf.version'] = thymeleafVersion
 
 dependencies {
+	compile('org.springframework.boot:spring-boot-starter-webflux')
+	compile('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
+	compile("org.thymeleaf:thymeleaf-spring5:${thymeleafVersion}")
 	compile('org.springframework.boot:spring-boot-starter-actuator')
-	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
-	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
 	compile('org.springframework.boot:spring-boot-devtools')
 
 	compile('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
@@ -49,14 +56,14 @@ dependencies {
 	compile('org.springframework.cloud:spring-cloud-starter-hystrix')
 	// end::deps[]
 
-	compile("org.springframework.boot:spring-boot-devtools")
 	compile('org.projectlombok:lombok')
-
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile("io.projectreactor.addons:reactor-test")
 }
 
 dependencyManagement {
 	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:Camden.SR2"
+		mavenBom "io.projectreactor:reactor-bom:Aluminium-SR1"
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:Dalston.BUILD-SNAPSHOT"
 	}
 }
