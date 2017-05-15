@@ -15,10 +15,12 @@
  */
 package com.greglturnquist.learningspringboot.webdriver;
 
+import static org.openqa.selenium.chrome.ChromeDriverService.*;
+
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -29,8 +31,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 
-import static org.openqa.selenium.chrome.ChromeDriverService.*;
-
 /**
  * Autoconfigure a {@link WebDriver} based on what's available, falling back to {@link HtmlUnitDriver}
  * if none other is available.
@@ -40,8 +40,10 @@ import static org.openqa.selenium.chrome.ChromeDriverService.*;
 // tag::1[]
 @Configuration
 @ConditionalOnClass(WebDriver.class)
-@EnableConfigurationProperties(WebDriverConfigurationProperties.class)
-@Import({ChromeDriverFactory.class, FirefoxDriverFactory.class, SafariDriverFactory.class})
+@EnableConfigurationProperties(
+	WebDriverConfigurationProperties.class)
+@Import({ChromeDriverFactory.class,
+	FirefoxDriverFactory.class, SafariDriverFactory.class})
 public class WebDriverAutoConfiguration {
 // end::1[]
 
@@ -59,67 +61,23 @@ public class WebDriverAutoConfiguration {
 		SafariDriverFactory safariDriverFactory,
 		ChromeDriverFactory chromeDriverFactory) {
 
-		WebDriver driver = firefoxDriver(firefoxDriverFactory);
+		WebDriver driver = firefoxDriverFactory.getObject();
 
 		if (driver == null) {
-			driver = safariDriver(safariDriverFactory);
+			driver = safariDriverFactory.getObject();
 		}
 
 		if (driver == null) {
-			driver = chromeDriver(chromeDriverFactory);
+			driver = chromeDriverFactory.getObject();
 		}
 
 		if (driver == null) {
-			driver = htmlUnitDriver();
+			driver = new HtmlUnitDriver();
 		}
 
 		return driver;
 	}
 	// end::3[]
-
-	// tag::4[]
-	@Bean
-	@Lazy
-	public WebDriver firefoxDriver(FirefoxDriverFactory factory) {
-		if (properties.getFirefox().isEnabled()) {
-			try {
-				return factory.getObject();
-			} catch (WebDriverException e) {
-				e.printStackTrace();
-				// swallow the exception
-			}
-		}
-		return null;
-	}
-	// end::4[]
-
-	@Bean
-	@Lazy
-	public WebDriver safariDriver(SafariDriverFactory factory) {
-		if (properties.getSafari().isEnabled()) {
-			try {
-				return factory.getObject();
-			} catch (WebDriverException e) {
-				e.printStackTrace();
-				// swallow the exception
-			}
-		}
-		return null;
-	}
-
-	@Bean
-	@Lazy
-	public WebDriver chromeDriver(ChromeDriverFactory factory) {
-		if (properties.getChrome().isEnabled()) {
-			try {
-				return factory.getObject();
-			} catch (IllegalStateException e) {
-				e.printStackTrace();
-				// swallow the exception
-			}
-		}
-		return null;
-	}
 
 	// tag::5[]
 	@Bean(destroyMethod = "stop")
@@ -130,13 +88,5 @@ public class WebDriverAutoConfiguration {
 		return createDefaultService();
 	}
 	// end::5[]
-
-	// tag::6[]
-	@Bean
-	@Lazy
-	public HtmlUnitDriver htmlUnitDriver() {
-		return new HtmlUnitDriver();
-	}
-	// end::6[]
 
 }

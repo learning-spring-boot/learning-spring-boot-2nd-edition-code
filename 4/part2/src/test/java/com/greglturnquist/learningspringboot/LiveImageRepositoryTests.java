@@ -15,25 +15,28 @@
  */
 package com.greglturnquist.learningspringboot;
 
+import static org.assertj.core.api.Assertions.*;
+
+import java.time.Duration;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import reactor.core.publisher.Mono;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import reactor.core.publisher.Mono;
-import java.time.Duration;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.*;
 
 /**
  * @author Greg Turnquist
  */
 // tag::1[]
 @RunWith(SpringRunner.class)
-@DataMongoTest(excludeAutoConfiguration = EmbeddedMongoAutoConfiguration.class)
+@DataMongoTest(excludeAutoConfiguration =
+	EmbeddedMongoAutoConfiguration.class)
 public class LiveImageRepositoryTests {
 
 	@Autowired

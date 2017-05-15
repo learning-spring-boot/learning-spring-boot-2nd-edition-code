@@ -15,13 +15,15 @@
  */
 package com.greglturnquist.learningspringboot;
 
-import org.springframework.data.repository.PagingAndSortingRepository;
+import reactor.core.publisher.Mono;
+
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 
 /**
  * @author Greg Turnquist
  */
-public interface ImageRepository extends PagingAndSortingRepository<Image, String> {
+public interface ImageRepository
+	extends ReactiveCrudRepository<Image, String> {
 
-	Image findByName(String name);
-
+	Mono<Image> findByName(String name);
 }

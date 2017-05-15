@@ -40,9 +40,10 @@ ext['thymeleaf.version'] = thymeleafVersion
 dependencies {
 	// tag::netty[]
 	compile('org.springframework.boot:spring-boot-starter-webflux') {
-		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+		exclude group: 'org.springframework.boot',
+				module: 'spring-boot-starter-reactor-netty'
 	}
-	compile('org.springframework.boot:spring-boot-starter-reactor-netty')
+	compile('org.springframework.boot:spring-boot-starter-tomcat')
 	// end::netty[]
 	compile("org.thymeleaf:thymeleaf-spring5:${thymeleafVersion}")
 	compile('org.projectlombok:lombok')

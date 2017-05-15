@@ -15,6 +15,13 @@
  */
 package com.greglturnquist.learningspringboot;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.openqa.selenium.chrome.ChromeDriverService.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -23,16 +30,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
-import org.springframework.boot.context.embedded.LocalServerPort;
+
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.FileCopyUtils;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.openqa.selenium.chrome.ChromeDriverService.*;
 
 /**
  * @author Greg Turnquist

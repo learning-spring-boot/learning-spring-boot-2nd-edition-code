@@ -15,6 +15,10 @@
  */
 package com.greglturnquist.learningspringboot.webdriver;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.mock;
+
 import org.junit.After;
 import org.junit.Test;
 import org.openqa.selenium.TakesScreenshot;
@@ -23,15 +27,12 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.safari.SafariDriver;
+
 import org.springframework.boot.test.util.EnvironmentTestUtils;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ClassUtils;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.mock;
 
 /**
  * @author Greg Turnquist
@@ -51,11 +52,13 @@ public class WebDriverAutoConfigurationTests {
 	private void load(Class<?>[] configs, String... environment) {
 		AnnotationConfigApplicationContext applicationContext =
 			new AnnotationConfigApplicationContext();
-		applicationContext.register(WebDriverAutoConfiguration.class);
+		applicationContext
+			.register(WebDriverAutoConfiguration.class);
 		if (configs.length > 0) {
 			applicationContext.register(configs);
 		}
-		EnvironmentTestUtils.addEnvironment(applicationContext, environment);
+		EnvironmentTestUtils
+			.addEnvironment(applicationContext, environment);
 		applicationContext.refresh();
 		this.context = applicationContext;
 	}
@@ -120,8 +123,10 @@ public class WebDriverAutoConfigurationTests {
 	protected static class MockFirefoxConfiguration {
 		@Bean
 		FirefoxDriverFactory firefoxDriverFactory() {
-			FirefoxDriverFactory factory = mock(FirefoxDriverFactory.class);
-			given(factory.getObject()).willReturn(mock(FirefoxDriver.class));
+			FirefoxDriverFactory factory =
+				mock(FirefoxDriverFactory.class);
+			given(factory.getObject())
+				.willReturn(mock(FirefoxDriver.class));
 			return factory;
 		}
 	}

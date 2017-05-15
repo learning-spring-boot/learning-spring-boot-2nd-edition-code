@@ -15,8 +15,16 @@
  */
 package com.greglturnquist.learningspringboot;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
+
+import java.io.IOException;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -28,12 +36,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import java.io.IOException;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
 
 /**
  * @author Greg Turnquist
@@ -41,7 +43,8 @@ import static org.mockito.BDDMockito.*;
 // tag::1[]
 @RunWith(SpringRunner.class)
 @WebFluxTest(controllers = HomeController.class)
-@Import({ReactiveThymeleafConfig.class, ThymeleafAutoConfiguration.class})
+@Import({ReactiveThymeleafConfig.class,
+	ThymeleafAutoConfiguration.class})
 public class HomeControllerTests {
 
 	@Autowired
@@ -71,7 +74,8 @@ public class HomeControllerTests {
 		verify(imageService).findAllImages();
 		verifyNoMoreInteractions(imageService);
 		assertThat(result.getResponseBody())
-			.contains("<title>Learning Spring Boot: Spring-a-Gram</title>")
+			.contains(
+				"<title>Learning Spring Boot: Spring-a-Gram</title>")
 			.contains("<a href=\"/images/alpha.png/raw\">")
 			.contains("<a href=\"/images/bravo.png/raw\">");
 	}
@@ -81,7 +85,8 @@ public class HomeControllerTests {
 	@Test
 	public void fetchingImageShouldWork() {
 		given(imageService.findOneImage(any()))
-			.willReturn(Mono.just(new ByteArrayResource("data".getBytes())));
+			.willReturn(Mono.just(
+				new ByteArrayResource("data".getBytes())));
 
 		webClient
 			.get().uri("/images/alpha.png/raw")

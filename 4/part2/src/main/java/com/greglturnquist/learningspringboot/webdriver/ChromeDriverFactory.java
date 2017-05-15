@@ -15,11 +15,11 @@
  */
 package com.greglturnquist.learningspringboot.webdriver;
 
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.ObjectFactory;
-
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.ObjectFactory;
 
 /**
  * @author Greg Turnquist
@@ -27,13 +27,24 @@ import org.openqa.selenium.chrome.ChromeDriverService;
 class ChromeDriverFactory implements ObjectFactory<ChromeDriver> {
 
 	private ChromeDriverService chromeDriverService;
+	private WebDriverConfigurationProperties properties;
 
-	public ChromeDriverFactory(ChromeDriverService chromeDriverService) {
+	public ChromeDriverFactory(ChromeDriverService chromeDriverService,
+							   WebDriverConfigurationProperties properties) {
 		this.chromeDriverService = chromeDriverService;
+		this.properties = properties;
 	}
 
 	@Override
 	public ChromeDriver getObject() throws BeansException {
-		return new ChromeDriver(chromeDriverService);
+		if (properties.getChrome().isEnabled()) {
+			try {
+				return new ChromeDriver(chromeDriverService);
+			} catch (IllegalStateException e) {
+				e.printStackTrace();
+				// swallow the exception
+			}
+		}
+		return null;
 	}
 }

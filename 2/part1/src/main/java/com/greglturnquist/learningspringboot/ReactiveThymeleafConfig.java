@@ -15,14 +15,16 @@
  */
 package com.greglturnquist.learningspringboot;
 
+import org.thymeleaf.spring5.SpringWebFluxTemplateEngine;
+import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
+import org.thymeleaf.spring5.view.reactive.ThymeleafReactiveViewResolver;
+
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.thymeleaf.spring5.SpringWebFluxTemplateEngine;
-import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
-import org.thymeleaf.spring5.view.reactive.ThymeleafReactiveViewResolver;
+import org.springframework.context.annotation.Primary;
 
 /**
  * @author Greg Turnquist
@@ -62,6 +64,7 @@ public class ReactiveThymeleafConfig {
 
 	// tag::2[]
 	@Bean
+	@Primary
 	public SpringResourceTemplateResolver thymeleafTemplateResolver(ApplicationContext applicationContext) {
 
 		final SpringResourceTemplateResolver resolver = new SpringResourceTemplateResolver();
