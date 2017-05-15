@@ -1,6 +1,7 @@
 buildscript {
 	ext {
 		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+		springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
 	}
 	repositories {
 		mavenCentral()
@@ -13,7 +14,7 @@ buildscript {
 }
 
 plugins {
-	id "io.spring.dependency-management" version "1.0.0.RC2"
+	id "io.spring.dependency-management" version "1.0.0.RELEASE"
 
 	// tag::gradle-git[]
 	id "com.gorylenko.gradle-git-properties" version "1.4.17"
@@ -45,7 +46,7 @@ dependencies {
 
 dependencyManagement {
 	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:Dalston.BUILD-SNAPSHOT"
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
 }
 // end::deps[]

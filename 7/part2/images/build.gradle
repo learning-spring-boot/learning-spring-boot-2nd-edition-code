@@ -1,7 +1,7 @@
 buildscript {
 	ext {
 		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
-		thymeleafVersion = '3.0.4-SNAPSHOT'
+		springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
 	}
 	repositories {
 		mavenCentral()
@@ -14,7 +14,7 @@ buildscript {
 }
 
 plugins {
-	id "io.spring.dependency-management" version "1.0.0.RC2"
+	id "io.spring.dependency-management" version "1.0.0.RELEASE"
 
 	// tag::gradle-git[]
 	id "com.gorylenko.gradle-git-properties" version "1.4.17"
@@ -41,12 +41,10 @@ jar {
 	version = '0.0.1-SNAPSHOT'
 }
 
-ext['thymeleaf.version'] = thymeleafVersion
-
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')
 	compile('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
-	compile("org.thymeleaf:thymeleaf-spring5:${thymeleafVersion}")
+	compile("org.springframework.boot:spring-boot-starter-thymeleaf")
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.springframework.boot:spring-boot-devtools')
 
@@ -63,7 +61,6 @@ dependencies {
 
 dependencyManagement {
 	imports {
-		mavenBom "io.projectreactor:reactor-bom:Aluminium-SR1"
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:Dalston.BUILD-SNAPSHOT"
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
 }

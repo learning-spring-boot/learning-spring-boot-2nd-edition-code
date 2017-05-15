@@ -2,7 +2,6 @@ buildscript {
 	// tag::versions[]
 	ext {
 		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
-		thymeleafVersion = '3.0.4-SNAPSHOT'
 	}
 	// end::versions[]
 	repositories {
@@ -16,7 +15,7 @@ buildscript {
 }
 
 plugins {
-	id "io.spring.dependency-management" version "1.0.0.RC2"
+	id "io.spring.dependency-management" version "1.0.0.RELEASE"
 }
 
 apply plugin: 'java'
@@ -38,18 +37,10 @@ repositories {
 }
 
 // tag::deps[]
-ext['thymeleaf.version'] = thymeleafVersion
-
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')
-	compile("org.thymeleaf:thymeleaf-spring5:${thymeleafVersion}")
+	compile("org.springframework.boot:spring-boot-starter-thymeleaf")
 	compile('org.projectlombok:lombok')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
-}
-
-dependencyManagement {
-	imports {
-		mavenBom "io.projectreactor:reactor-bom:Aluminium-SR1"
-	}
 }
 // end::deps[]

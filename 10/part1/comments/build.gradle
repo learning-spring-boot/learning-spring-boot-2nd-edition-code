@@ -1,6 +1,7 @@
 buildscript {
 	ext {
 		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+		springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
 	}
 	repositories {
 		mavenCentral()
@@ -13,7 +14,7 @@ buildscript {
 }
 
 plugins {
-	id "io.spring.dependency-management" version "1.0.0.RC2"
+	id "io.spring.dependency-management" version "1.0.0.RELEASE"
 
 	// tag::gradle-git[]
 	id "com.gorylenko.gradle-git-properties" version "1.4.17"
@@ -39,8 +40,6 @@ jar {
 	version = '0.0.1-SNAPSHOT'
 }
 
-ext['reactor.version'] = '3.0.3.RELEASE'
-
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
@@ -59,6 +58,6 @@ dependencies {
 
 dependencyManagement {
 	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:Dalston.BUILD-SNAPSHOT"
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
 }
