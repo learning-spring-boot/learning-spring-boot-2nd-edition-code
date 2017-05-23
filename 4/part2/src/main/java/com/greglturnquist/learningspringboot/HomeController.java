@@ -15,20 +15,23 @@
  */
 package com.greglturnquist.learningspringboot;
 
+import java.io.IOException;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import java.io.IOException;
 
 /**
  * @author Greg Turnquist
@@ -47,7 +50,8 @@ public class HomeController {
 
 	@GetMapping("/")
 	public Mono<String> index(Model model) {
-		model.addAttribute("images", imageService.findAllImages());
+		model.addAttribute("images",
+			imageService.findAllImages());
 		return Mono.just("index");
 	}
 
@@ -74,16 +78,18 @@ public class HomeController {
 	}
 
 	@PostMapping(value = BASE_PATH)
-	public Mono<String> createFile(Flux<MultipartFile> files) {
+	public Mono<String> createFile(@RequestPart(name = "file")
+										   Flux<FilePart> files) {
 		return imageService.createImage(files)
-			.then(() -> Mono.just("redirect:/"));
+			.then(Mono.just("redirect:/"));
 	}
 
-	// TODO: Replace with @DeleteMapping pending https://jira.spring.io/browse/SPR-15206
-	@DeleteMapping(BASE_PATH + "/" + FILENAME)
+	@DeleteMapping(BASE_PATH + "/" + FILENAME + "/delete")
 	public Mono<String> deleteFile(@PathVariable String filename) {
 		return imageService.deleteImage(filename)
-			.then(() -> Mono.just("redirect:/"));
+			.log("delete-image")
+			.then(Mono.just("redirect:/"))
+			.log("redirect");
 	}
 
 }

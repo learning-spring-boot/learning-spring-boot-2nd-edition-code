@@ -15,6 +15,16 @@
  */
 package com.greglturnquist.learningspringboot;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.UUID;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
@@ -23,14 +33,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.UUID;
 
 /**
  * @author Greg Turnquist
@@ -103,7 +105,7 @@ public class ImageService {
 		Mono<Void> deleteDatabaseImage = imageRepository
 			.findByName(filename)
 			.log("deleteImage-find")
-			.then(imageRepository::delete)
+			.flatMap(imageRepository::delete)
 			.log("deleteImage-record");
 
 		Mono<Void> deleteFile = Mono.fromRunnable(() -> {
