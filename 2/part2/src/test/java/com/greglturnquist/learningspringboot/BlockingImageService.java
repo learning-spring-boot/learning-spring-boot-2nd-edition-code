@@ -15,12 +15,13 @@
  */
 package com.greglturnquist.learningspringboot;
 
-import org.springframework.core.io.Resource;
-import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Flux;
-
 import java.time.Duration;
 import java.util.List;
+
+import reactor.core.publisher.Flux;
+
+import org.springframework.core.io.Resource;
+import org.springframework.http.codec.multipart.FilePart;
 
 /**
  * @author Greg Turnquist
@@ -51,7 +52,7 @@ public class BlockingImageService {
 	// end::3[]
 
 	// tag::4[]
-	public void createImage(List<MultipartFile> files) {
+	public void createImage(List<FilePart> files) {
 		imageService.createImage(Flux.fromIterable(files))
 			.block(Duration.ofMinutes(1));
 	}

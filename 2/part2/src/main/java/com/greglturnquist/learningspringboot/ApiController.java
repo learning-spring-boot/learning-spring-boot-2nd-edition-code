@@ -17,13 +17,15 @@ package com.greglturnquist.learningspringboot;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
+
+import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Greg Turnquist
@@ -50,7 +52,7 @@ public class ApiController {
 
 	// tag::post[]
 	@PostMapping(API_BASE_PATH + "/images")
-	Mono<Void> create(@RequestBody Flux<Image> images) {
+	Mono<Void> create(@RequestPart Flux<FilePart> images) {
 		Hooks.onOperator(operatorHook -> operatorHook.operatorStacktrace());
 
 		return images

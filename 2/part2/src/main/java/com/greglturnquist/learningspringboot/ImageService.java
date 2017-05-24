@@ -15,22 +15,23 @@
  */
 package com.greglturnquist.learningspringboot;
 
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.stereotype.Service;
-import org.springframework.util.FileCopyUtils;
-import org.springframework.util.FileSystemUtils;
-import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.FileSystemUtils;
 
 /**
  * @author Greg Turnquist
@@ -71,20 +72,10 @@ public class ImageService {
 	// end::3[]
 
 	// tag::4[]
-	public Mono<Void> createImage(Flux<MultipartFile> files) {
+	public Mono<Void> createImage(Flux<FilePart> files) {
 		return files
-			.map(file -> {
-				if (!file.isEmpty()) {
-					try {
-						return Files.copy(file.getInputStream(),
-							Paths.get(UPLOAD_ROOT,
-								file.getOriginalFilename()));
-					} catch (IOException e) {
-						throw new RuntimeException(e);
-					}
-				}
-				return 0;
-			})
+			.flatMap(file -> file.transferTo(
+				Paths.get(UPLOAD_ROOT, file.filename()).toFile()))
 			.then();
 	}
 	// end::4[]
