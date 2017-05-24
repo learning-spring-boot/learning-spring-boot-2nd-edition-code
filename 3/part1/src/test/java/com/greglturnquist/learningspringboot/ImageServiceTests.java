@@ -17,19 +17,19 @@ package com.greglturnquist.learningspringboot;
 
 import java.time.Duration;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import reactor.core.publisher.Mono;
 
 /**
  * @author Greg Turnquist
@@ -45,23 +45,19 @@ public class ImageServiceTests {
 	@Autowired
 	ImageService imageService;
 
+	@Autowired
+	MongoOperations operations;
+
 	@Before
 	public void setUp() {
-		repository
-			.deleteAll()
-			.then(() -> Mono.when(
-				repository.save(
-					new Image("1",
-						"learning-spring-boot.png")),
-				repository.save(
-					new Image("2",
-						"learning-spring-boot-2nd-edition.png")),
-				repository.save(
-					new Image("3",
-						"bazinga.png"))
-				)
-			)
-			.block(Duration.ofSeconds(30));
+		operations.dropCollection(Image.class);
+
+		operations.insert(new Image("1",
+			"learning-spring-boot-cover.jpg"));
+		operations.insert(new Image("2",
+			"learning-spring-boot-2nd-edition-cover.jpg"));
+		operations.insert(new Image("3",
+			"bazinga.png"));
 	}
 
 	@Test

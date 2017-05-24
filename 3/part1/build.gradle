@@ -37,6 +37,7 @@ repositories {
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')
+	compile('org.synchronoss.cloud:nio-multipart-parser:1.0.2')
 	// tag::dep-1[]
 	compile('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
 	// end::dep-1[]

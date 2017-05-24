@@ -16,10 +16,8 @@
 package com.greglturnquist.learningspringboot;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
-
-import java.time.Duration;
 
 /**
  * @author Greg Turnquist
@@ -28,34 +26,26 @@ import java.time.Duration;
 @Component
 public class InitDatabase implements CommandLineRunner {
 
-	private final ImageRepository repository;
+	private final MongoOperations operations;
 
-	public InitDatabase(ImageRepository repository) {
-		this.repository = repository;
+	public InitDatabase(MongoOperations operations) {
+		this.operations = operations;
 	}
 
 	@Override
 	public void run(String... args) throws Exception {
-		repository
-			.deleteAll()
-			.then(() -> Mono.when(
-					repository.save(
-						new Image("1",
-							"learning-spring-boot.png")),
-					repository.save(
-						new Image("2",
-							"learning-spring-boot-2nd-edition.png")),
-					repository.save(
-						new Image("3",
-							"bazinga.png"))
-				))
-			.then(() -> repository.findAll().collectList())
-			.then(images -> {
-				images.forEach(image ->
-					System.out.println(image.toString()));
-				return Mono.empty();
-			})
-			.block(Duration.ofSeconds(30));
+		operations.dropCollection(Image.class);
+
+		operations.insert(new Image("1",
+			"learning-spring-boot-cover.jpg"));
+		operations.insert(new Image("2",
+			"learning-spring-boot-2nd-edition-cover.jpg"));
+		operations.insert(new Image("3",
+			"bazinga.png"));
+
+		operations.findAll(Image.class).forEach(image -> {
+			System.out.println(image.toString());
+		});
 	}
 }
 // end::code[]

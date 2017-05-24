@@ -49,7 +49,6 @@ public class EmbeddedImageRepositoryTests {
 	 */
 	@Before
 	public void setUp() {
-
 		operations.dropCollection(Image.class);
 
 		operations.insert(new Image("1",

@@ -15,28 +15,29 @@
  */
 package com.greglturnquist.learningspringboot;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.FileSystemUtils;
-import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.mockito.BDDMockito.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static org.assertj.core.api.Assertions.tuple;
-import static org.assertj.core.api.BDDAssertions.then;
-import static org.mockito.BDDMockito.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.FileSystemUtils;
 
 /**
  * @author Greg Turnquist
@@ -107,8 +108,12 @@ public class ImageServiceTests {
 		given(repository.save(new Image(any(), alphaImage.getName()))).willReturn(Mono.just(alphaImage));
 		given(repository.save(new Image(any(), bravoImage.getName()))).willReturn(Mono.just(bravoImage));
 		given(repository.findAll()).willReturn(Flux.just(alphaImage, bravoImage));
-		MultipartFile file1 = new MockMultipartFile(alphaImage.getName(), alphaImage.getName(), "JPG", "<image data>".getBytes());
-		MultipartFile file2 = new MockMultipartFile(bravoImage.getName(), bravoImage.getName(), "JPG", "<image data>".getBytes());
+		FilePart file1 = mock(FilePart.class);
+		given(file1.filename()).willReturn(alphaImage.getName());
+		given(file1.transferTo(any())).willReturn(Mono.empty());
+		FilePart file2 = mock(FilePart.class);
+		given(file2.filename()).willReturn(bravoImage.getName());
+		given(file2.transferTo(any())).willReturn(Mono.empty());
 
 		// when
 		Mono<Void> done = imageService.createImage(Flux.just(file1, file2));

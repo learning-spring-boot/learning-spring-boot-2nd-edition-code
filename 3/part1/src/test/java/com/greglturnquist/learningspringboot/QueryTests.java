@@ -15,27 +15,30 @@
  */
 package com.greglturnquist.learningspringboot;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.*;
+import static org.springframework.data.mongodb.core.query.Criteria.*;
+
+import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 import org.springframework.test.context.junit4.SpringRunner;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers.*;
-import static org.springframework.data.mongodb.core.query.Criteria.*;
 
 /**
  * @author Greg Turnquist
@@ -53,27 +56,27 @@ public class QueryTests {
 	ReactiveMongoOperations operations;
 	// end::inject-template[]
 
+	@Autowired
+	MongoOperations blockingOperations;
+
 	@Before
 	public void setUp() {
 		// tag::setup[]
-		repository.deleteAll()
-			.then(() -> {
-				Employee e1 = new Employee();
-				e1.setId(UUID.randomUUID().toString());
-				e1.setFirstName("Bilbo");
-				e1.setLastName("Baggins");
-				e1.setRole("burglar");
-				return repository.save(e1);
-			})
-			.then(() -> {
-				Employee e2 = new Employee();
-				e2.setId(UUID.randomUUID().toString());
-				e2.setFirstName("Frodo");
-				e2.setLastName("Baggins");
-				e2.setRole("ring bearer");
-				return repository.save(e2);
-			})
-			.block();
+		blockingOperations.dropCollection(Employee.class);
+
+		Employee e1 = new Employee();
+		e1.setId(UUID.randomUUID().toString());
+		e1.setFirstName("Bilbo");
+		e1.setLastName("Baggins");
+		e1.setRole("burglar");
+		blockingOperations.insert(e1);
+
+		Employee e2 = new Employee();
+		e2.setId(UUID.randomUUID().toString());
+		e2.setFirstName("Frodo");
+		e2.setLastName("Baggins");
+		e2.setRole("ring bearer");
+		blockingOperations.insert(e2);
 		// end::setup[]
 	}
 

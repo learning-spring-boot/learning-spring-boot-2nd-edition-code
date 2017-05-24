@@ -15,23 +15,24 @@
  */
 package com.greglturnquist.learningspringboot;
 
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.stereotype.Service;
-import org.springframework.util.FileCopyUtils;
-import org.springframework.util.FileSystemUtils;
-import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.UUID;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.FileSystemUtils;
 
 /**
  * @author Greg Turnquist
@@ -66,24 +67,17 @@ public class ImageService {
 	}
 
 	// tag::2[]
-	public Mono<Void> createImage(Flux<MultipartFile> files) {
+	public Mono<Void> createImage(Flux<FilePart> files) {
 		return files
-			.filter(file -> !file.isEmpty())
 			.flatMap(file -> {
 				Mono<Image> saveDatabaseImage = imageRepository.save(
 					new Image(
 						UUID.randomUUID().toString(),
-						file.getOriginalFilename()));
+						file.filename()));
 
-				Mono<Void> copyFile = Mono.fromRunnable(() -> {
-					try {
-						Files.copy(file.getInputStream(),
-							Paths.get(UPLOAD_ROOT,
-								file.getOriginalFilename()));
-					} catch (IOException e) {
-						throw new RuntimeException(e);
-					}
-				});
+				Mono<Void> copyFile = file
+					.transferTo(Paths.get(UPLOAD_ROOT, file.filename()).toFile());
+
 				return Mono.when(saveDatabaseImage, copyFile);
 			})
 			.then();
@@ -94,7 +88,7 @@ public class ImageService {
 	public Mono<Void> deleteImage(String filename) {
 		Mono<Void> deleteDatabaseImage = imageRepository
 			.findByName(filename)
-			.then(imageRepository::delete);
+			.flatMap(imageRepository::delete);
 
 		Mono<Void> deleteFile = Mono.fromRunnable(() -> {
 			try {

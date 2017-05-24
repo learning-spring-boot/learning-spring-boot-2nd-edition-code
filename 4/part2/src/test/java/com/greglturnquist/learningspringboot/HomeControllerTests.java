@@ -32,6 +32,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -121,17 +122,13 @@ public class HomeControllerTests {
 	// tag::5[]
 	@Test
 	public void deleteImageShouldWork() {
-		Image alphaImage = new Image("1", "alpha.png");
 		given(imageService.deleteImage(any())).willReturn(Mono.empty());
 
-		// TODO: Replace with delete() with ready
 		webClient
-			.post().uri("/images/alpha.png")
+			.delete().uri("/images/alpha.png/delete")
 			.exchange()
-			// TODO: Reenable when Thymeleaf redirect:/ issue resolved
-			//.expectStatus().isSeeOther()
-			.expectStatus().is4xxClientError();
-			//.expectHeader().valueEquals(HttpHeaders.LOCATION, "/");
+			.expectStatus().isSeeOther()
+			.expectHeader().valueEquals(HttpHeaders.LOCATION, "/");
 
 		verify(imageService).deleteImage("alpha.png");
 		verifyNoMoreInteractions(imageService);

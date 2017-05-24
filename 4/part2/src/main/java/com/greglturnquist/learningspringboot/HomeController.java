@@ -81,15 +81,15 @@ public class HomeController {
 	public Mono<String> createFile(@RequestPart(name = "file")
 										   Flux<FilePart> files) {
 		return imageService.createImage(files)
-			.then(Mono.just("redirect:/"));
+			.map(aVoid -> "redirect:/");
 	}
 
+	// TODO: Drop "/delete" suffix when https://jira.spring.io/browse/SPR-15291 is patched in Spring 5.0 RC2
 	@DeleteMapping(BASE_PATH + "/" + FILENAME + "/delete")
 	public Mono<String> deleteFile(@PathVariable String filename) {
 		return imageService.deleteImage(filename)
 			.log("delete-image")
-			.then(Mono.just("redirect:/"))
-			.log("redirect");
+			.map(aVoid -> "redirect:/");
 	}
 
 }

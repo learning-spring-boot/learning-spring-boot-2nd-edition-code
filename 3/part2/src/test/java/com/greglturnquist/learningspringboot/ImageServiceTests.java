@@ -15,24 +15,11 @@
  */
 package com.greglturnquist.learningspringboot;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.FileCopyUtils;
-import org.springframework.util.FileSystemUtils;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Hooks;
-import reactor.core.publisher.Mono;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.mock;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -41,7 +28,25 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
+import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.FileSystemUtils;
 
 /**
  * @author Greg Turnquist
@@ -57,25 +62,19 @@ public class ImageServiceTests {
 	@Autowired
 	ImageService imageService;
 
+	@Autowired
+	MongoOperations operations;
+
 	@Before
 	public void setUp() throws IOException {
-		repository
-			.deleteAll()
-			.log("setUp")
-			.then(() -> Mono.when(
-				repository.save(
-					new Image("1",
-						"learning-spring-boot-cover.jpg")).log("setUp"),
-				repository.save(
-					new Image("2",
-						"learning-spring-boot-2nd-edition-cover.jpg")).log("setUp"),
-				repository.save(
-					new Image("3",
-						"bazinga.png")).log("setUp")
-				).log("setUp")
-			)
-			.log("setUp")
-			.block(Duration.ofSeconds(30));
+		operations.dropCollection(Image.class);
+
+		operations.insert(new Image("1",
+			"learning-spring-boot-cover.jpg"));
+		operations.insert(new Image("2",
+			"learning-spring-boot-2nd-edition-cover.jpg"));
+		operations.insert(new Image("3",
+			"bazinga.png"));
 
 		FileSystemUtils.deleteRecursively(new File(ImageService.UPLOAD_ROOT));
 
@@ -91,12 +90,14 @@ public class ImageServiceTests {
 
 		FileCopyUtils.copy("Test file3",
 			new FileWriter(ImageService.UPLOAD_ROOT + "/bazinga.png"));
-
 	}
 
 	@Test
 	public void findAllImages() {
-		List<Image> images = imageService.findAllImages().collectList().block(Duration.ofSeconds(30));
+		List<Image> images = imageService
+			.findAllImages()
+			.collectList()
+			.block(Duration.ofSeconds(30));
 		assertThat(images)
 			.hasSize(3)
 			.extracting("name").contains(
@@ -118,12 +119,18 @@ public class ImageServiceTests {
 
 	@Test
 	public void createImages() {
+		Image alphaImage = new Image("1", "alpha.jpg");
+		Image bravoImage = new Image("2", "bravo.jpg");
+		FilePart file1 = mock(FilePart.class);
+		given(file1.filename()).willReturn(alphaImage.getName());
+		given(file1.transferTo(any())).willReturn(Mono.empty());
+		FilePart file2 = mock(FilePart.class);
+		given(file2.filename()).willReturn(bravoImage.getName());
+		given(file2.transferTo(any())).willReturn(Mono.empty());
+
 		List<Image> images = imageService
-			.createImage(Flux.just(
-				new MockMultipartFile("alpha.png", "alpha.png", "PNG","data1".getBytes()),
-				new MockMultipartFile("bravo.png", "bravo.png", "PNG","data2".getBytes())
-			))
-			.then(() -> imageService.findAllImages().collectList())
+			.createImage(Flux.just(file1, file2))
+			.then(imageService.findAllImages().collectList())
 			.block(Duration.ofSeconds(30));
 
 		assertThat(images).hasSize(5);

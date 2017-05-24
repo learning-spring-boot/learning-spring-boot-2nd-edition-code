@@ -24,7 +24,6 @@ import java.util.UUID;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -80,8 +79,9 @@ public class ImageService {
 						file.filename()))
 					.log("createImage-save");
 
-				Mono<Void> copyFile = file.transferTo(Paths.get(UPLOAD_ROOT,
-					file.filename()).toFile());
+				Mono<Void> copyFile = file
+					.transferTo(Paths.get(UPLOAD_ROOT, file.filename()).toFile())
+					.log("createImage-copy");
 
 				return Mono.when(saveDatabaseImage, copyFile)
 					.log("createImage-when");
@@ -93,7 +93,7 @@ public class ImageService {
 	// end::2[]
 
 	// tag::3[]
-	public Mono<Tuple2<Void, Void>> deleteImage(String filename) {
+	public Mono<Void> deleteImage(String filename) {
 		Mono<Void> deleteDatabaseImage = imageRepository
 			.findByName(filename)
 			.log("deleteImage-find")
@@ -110,7 +110,9 @@ public class ImageService {
 		.log("deleteImage-file");
 
 		return Mono.when(deleteDatabaseImage, deleteFile)
-			.log("deleteImage-when");
+			.log("deleteImage-when")
+			.then()
+			.log("deleteImage-done");
 	}
 	// end::3[]
 
