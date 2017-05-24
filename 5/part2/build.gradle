@@ -13,8 +13,6 @@ buildscript {
 }
 
 plugins {
-	id "io.spring.dependency-management" version "1.0.0.RELEASE"
-
 	// tag::gradle-git[]
 	id "com.gorylenko.gradle-git-properties" version "1.4.17"
 	// end::gradle-git[]
@@ -23,6 +21,7 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
 
 jar {
 	baseName = 'learning-spring-boot'

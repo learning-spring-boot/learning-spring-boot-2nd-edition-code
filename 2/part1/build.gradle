@@ -14,13 +14,10 @@ buildscript {
 	}
 }
 
-plugins {
-	id "io.spring.dependency-management" version "1.0.0.RELEASE"
-}
-
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
 
 jar {
 	baseName = 'learning-spring-boot'
