@@ -54,7 +54,7 @@ dependencies {
 
 	// tag::spring-session[]
 	compile('org.springframework.boot:spring-boot-starter-security')
-	compile('org.springframework.session:spring-session-data-mongo')
+	compile('org.springframework.session:spring-session-data-mongodb:2.0.0.BUILD-SNAPSHOT')
 	// end::spring-session[]
 
 	// tag::thymeleaf-security[]

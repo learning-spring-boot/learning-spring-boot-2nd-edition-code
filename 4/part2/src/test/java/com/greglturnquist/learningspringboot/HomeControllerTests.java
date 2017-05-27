@@ -125,7 +125,7 @@ public class HomeControllerTests {
 		given(imageService.deleteImage(any())).willReturn(Mono.empty());
 
 		webClient
-			.delete().uri("/images/alpha.png/delete")
+			.delete().uri("/images/alpha.png")
 			.exchange()
 			.expectStatus().isSeeOther()
 			.expectHeader().valueEquals(HttpHeaders.LOCATION, "/");

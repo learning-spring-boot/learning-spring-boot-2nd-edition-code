@@ -84,8 +84,7 @@ public class HomeController {
 			.map(aVoid -> "redirect:/");
 	}
 
-	// TODO: Drop "/delete" suffix when https://jira.spring.io/browse/SPR-15291 is patched in Spring 5.0 RC2
-	@DeleteMapping(BASE_PATH + "/" + FILENAME + "/delete")
+	@DeleteMapping(BASE_PATH + "/" + FILENAME)
 	public Mono<String> deleteFile(@PathVariable String filename) {
 		return imageService.deleteImage(filename)
 			.map(aVoid -> "redirect:/");

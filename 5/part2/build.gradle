@@ -49,6 +49,7 @@ dependencies {
 	}
 	compile('org.springframework.boot:spring-boot-starter-undertow')
 	// end::undertow[]
+	compile('org.synchronoss.cloud:nio-multipart-parser:1.0.2')
 
 	compile('org.projectlombok:lombok')
 

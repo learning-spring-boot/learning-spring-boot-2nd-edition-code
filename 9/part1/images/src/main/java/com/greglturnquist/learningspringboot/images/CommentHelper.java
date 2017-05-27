@@ -15,21 +15,23 @@
  */
 package com.greglturnquist.learningspringboot.images;
 
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
-import com.greglturnquist.learningspringboot.ImagesConfiguration;
+import java.util.Collections;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.codec.Base64;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Base64Utils;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Collections;
-import java.util.List;
+import com.greglturnquist.learningspringboot.ImagesConfiguration;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
 /**
  * @author Greg Turnquist
@@ -59,7 +61,7 @@ public class CommentHelper {
 			new HttpEntity<>(new HttpHeaders() {{
 				String credentials = imagesConfiguration.getCommentsUser() + ":" +
 					imagesConfiguration.getCommentsPassword();
-				String token = new String(Base64.encode(credentials.getBytes()));
+				String token = new String(Base64Utils.encode(credentials.getBytes()));
 				set(AUTHORIZATION, "Basic " + token);
 				set("SESSION", sessionId);
 			}}),

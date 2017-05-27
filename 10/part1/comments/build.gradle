@@ -50,7 +50,7 @@ dependencies {
 	compile('org.projectlombok:lombok')
 
 	compile('org.springframework.boot:spring-boot-starter-security')
-	compile('org.springframework.session:spring-session-data-mongo')
+	compile('org.springframework.session:spring-session-data-mongodb:2.0.0.BUILD-SNAPSHOT')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }

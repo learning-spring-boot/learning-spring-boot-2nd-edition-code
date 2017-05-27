@@ -81,8 +81,7 @@ public class HomeController {
 			.map(aVoid -> "redirect:/");
 	}
 
-	// TODO: Replace with @DeleteMapping pending https://jira.spring.io/browse/SPR-15206
-	@DeleteMapping(BASE_PATH + "/" + FILENAME + "/delete")
+	@DeleteMapping(BASE_PATH + "/" + FILENAME)
 	public Mono<String> deleteFile(@PathVariable String filename) {
 		return imageService.deleteImage(filename)
 			.map(aVoid -> "redirect:/");

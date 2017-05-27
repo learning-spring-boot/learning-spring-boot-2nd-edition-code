@@ -64,7 +64,7 @@ dependencies {
 	compile('org.springframework.security:spring-security-messaging')
 	//end::websocket[]
 
-	compile('org.springframework.session:spring-session-data-mongo')
+	compile('org.springframework.session:spring-session-data-mongodb:2.0.0.BUILD-SNAPSHOT')
 
 	// tag::zuul[]
 	compile('org.springframework.cloud:spring-cloud-starter-zuul')
