@@ -15,6 +15,8 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
+import reactor.core.publisher.Mono;
+
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.stereotype.Controller;
@@ -38,14 +40,18 @@ public class CommentController {
 	}
 
 	@PostMapping("/comments")
-	public String addComment(Comment newComment) {
-		rabbitTemplate.convertAndSend(
-			"learning-spring-boot", "comments.new", newComment);
-		counterService.increment("comments.total.produced");
-		counterService.increment(
-			"comments." + newComment.getImageId() + ".produced");
-		return "redirect:/";
+	public Mono<String> addComment(Comment newComment) {
+		return Mono.fromRunnable(() -> rabbitTemplate
+				.convertAndSend(
+					"learning-spring-boot",
+					"comments.new", newComment)
+			)
+			.map(aVoid -> {
+				counterService.increment("comments.total.produced");
+				counterService.increment(
+					"comments." + newComment.getImageId() + ".produced");
+				return "redirect:/";
+			});
 	}
-
 }
 // end::code[]

@@ -15,19 +15,22 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
+import reactor.core.publisher.Mono;
+
 import org.springframework.data.repository.Repository;
 
 /**
  * @author Greg Turnquist
  */
 // tag::code[]
-public interface CommentWriterRepository extends Repository<Comment, String> {
+public interface CommentWriterRepository
+	extends Repository<Comment, String> {
 
-	Comment save(Comment newComment);
+	Mono<Comment> save(Mono<Comment> newComment);
 
 	// Needed to support save()
-	Comment findOne(String id);
+	Mono<Comment> findOne(String id);
 
-	void deleteAll();
+	Mono<Void> deleteAll();
 }
 // end::code[]

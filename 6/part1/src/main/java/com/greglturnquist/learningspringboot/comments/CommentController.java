@@ -15,6 +15,8 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
+import reactor.core.publisher.Mono;
+
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,9 +35,13 @@ public class CommentController {
 	}
 
 	@PostMapping("/comments")
-	public String addComment(Comment newComment) {
-		rabbitTemplate.convertAndSend("learning-spring-boot", "comments.new", newComment);
-		return "redirect:/";
+	public Mono<String> addComment(Comment newComment) {
+		return Mono.fromRunnable(() -> rabbitTemplate
+			.convertAndSend(
+				"learning-spring-boot",
+				"comments.new", newComment)
+		)
+		.map(aVoid -> "redirect:/");
 	}
 
 }

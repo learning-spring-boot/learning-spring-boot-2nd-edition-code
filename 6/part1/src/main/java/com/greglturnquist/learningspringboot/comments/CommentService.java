@@ -15,6 +15,8 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
+import reactor.core.publisher.Mono;
+
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
@@ -45,7 +47,9 @@ public class CommentService {
 		key = "comments.new"
 	))
 	public void save(Comment newComment) {
-		repository.save(newComment);
+		repository
+			.save(Mono.just(newComment))
+			.subscribe();
 	}
 	// end::comment-service-2[]
 

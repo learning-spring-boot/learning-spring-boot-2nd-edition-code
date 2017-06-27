@@ -15,6 +15,8 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
+import reactor.core.publisher.Mono;
+
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
@@ -48,10 +50,14 @@ public class CommentService {
 		key = "comments.new"
 	))
 	public void save(Comment newComment) {
-		repository.save(newComment);
-		counterService.increment("comments.total.consumed");
-		counterService.increment(
-			"comments." + newComment.getImageId() + ".consumed");
+		repository
+			.save(Mono.just(newComment))
+			.thenEmpty(subscriber -> {
+				counterService.increment("comments.total.consumed");
+				counterService.increment(
+					"comments." + newComment.getImageId() + ".consumed");
+			})
+			.subscribe();
 	}
 	// end::code[]
 
