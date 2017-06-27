@@ -15,6 +15,8 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
+import reactor.core.publisher.Mono;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.cloud.stream.annotation.EnableBinding;
@@ -45,18 +47,22 @@ public class CommentService {
 	// tag::stream-2[]
 	@StreamListener(Sink.INPUT)
 	public void save(Comment newComment) {
-		System.out.println("Saving new comment " + newComment.toString());
-		repository.save(newComment);
-		counterService.increment("comments.total.consumed");
-		counterService.increment(
-			"comments." + newComment.getImageId() + ".consumed");
+		repository
+			.save(Mono.just(newComment))
+			.thenEmpty(subscriber -> {
+				counterService.increment(
+					"comments.total.consumed");
+				counterService.increment(
+					"comments." + newComment.getImageId() + ".consumed");
+			})
+			.subscribe();
 	}
 	// end::stream-2[]
 
 	@Bean
 	CommandLineRunner setUp(CommentRepository repository) {
 		return args -> {
-			repository.deleteAll();
+			repository.deleteAll().subscribe();
 		};
 	}
 }
