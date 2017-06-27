@@ -69,7 +69,7 @@ public class CommentService {
 	@Bean
 	CommandLineRunner setUp(CommentWriterRepository repository) {
 		return args -> {
-			repository.deleteAll();
+			repository.deleteAll().subscribe();
 		};
 	}
 

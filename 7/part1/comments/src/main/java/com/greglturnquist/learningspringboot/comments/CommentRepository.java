@@ -15,9 +15,10 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
-import org.springframework.data.repository.Repository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
+import org.springframework.data.repository.Repository;
 
 /**
  * @author Greg Turnquist
@@ -26,13 +27,13 @@ import java.util.List;
 public interface CommentRepository
 	extends Repository<Comment, String> {
 
-	List<Comment> findByImageId(String imageId);
+	Flux<Comment> findByImageId(String imageId);
 
-	Comment save(Comment newComment);
+	Mono<Comment> save(Mono<Comment> newComment);
 
 	// Required to support save()
-	Comment findOne(String id);
+	Mono<Comment> findOne(String id);
 
-	void deleteAll();
+	Mono<Void> deleteAll();
 }
 // end::code[]

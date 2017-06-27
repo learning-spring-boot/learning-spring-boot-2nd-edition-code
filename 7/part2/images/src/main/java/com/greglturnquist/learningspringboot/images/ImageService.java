@@ -15,6 +15,16 @@
  */
 package com.greglturnquist.learningspringboot.images;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.UUID;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.boot.actuate.metrics.GaugeService;
@@ -23,19 +33,10 @@ import org.springframework.boot.actuate.metrics.writer.Delta;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.UUID;
 
 /**
  * @author Greg Turnquist
@@ -45,87 +46,122 @@ public class ImageService {
 
 	private static String UPLOAD_ROOT = "upload-dir";
 
-	private final ImageRepository repository;
 	private final ResourceLoader resourceLoader;
+	private final ImageRepository imageRepository;
 
-// tag::metric-1[]
+	// tag::metric-1[]
 	private final CounterService counterService;
 	private final GaugeService gaugeService;
 	private final InMemoryMetricRepository inMemoryMetricRepository;
 
-	public ImageService(ImageRepository repository,
-						ResourceLoader resourceLoader,
+	public ImageService(ResourceLoader resourceLoader,
+						ImageRepository imageRepository,
 						CounterService counterService,
 						GaugeService gaugeService,
 						InMemoryMetricRepository
-								inMemoryMetricRepository) {
+							inMemoryMetricRepository) {
 
-		this.repository = repository;
 		this.resourceLoader = resourceLoader;
+		this.imageRepository = imageRepository;
 		this.counterService = counterService;
 		this.gaugeService = gaugeService;
 		this.inMemoryMetricRepository = inMemoryMetricRepository;
 	}
 // end::metric-1[]
 
-	public Page<Image> findPage(Pageable pageable) {
-		return repository.findAll(pageable);
+	public Flux<Image> findAllImages() {
+		return imageRepository.findAll()
+			.log("findAll");
 	}
 
 
-	public Resource findOneImage(String filename) {
-		return resourceLoader.getResource("file:" + UPLOAD_ROOT + "/" + filename);
+	public Mono<Resource> findOneImage(String filename) {
+		return Mono.fromSupplier(() ->
+			resourceLoader.getResource(
+				"file:" + UPLOAD_ROOT + "/" + filename))
+			.log("findOneImage");
 	}
 
 	// tag::metric-2[]
-	public void createImage(MultipartFile file) throws IOException {
+	public Mono<Void> createImage(Flux<FilePart> files) {
+		return files
+			.log("createImage-files")
+			.flatMap(file -> {
+				Mono<Image> saveDatabaseImage = imageRepository.save(
+					new Image(
+						UUID.randomUUID().toString(),
+						file.filename()))
+					.log("createImage-save");
 
-		if (!file.isEmpty()) {
-			Files.copy(file.getInputStream(),
-				Paths.get(UPLOAD_ROOT, file.getOriginalFilename()));
+				Mono<Void> copyFile = file
+					.transferTo(Paths.get(UPLOAD_ROOT, file.filename()).toFile())
+					.log("createImage-copy");
 
-			repository.save(new Image(UUID.randomUUID().toString(),
-				file.getOriginalFilename()));
+				Mono<Void> countFile = Mono.fromRunnable(() -> {
+					counterService.increment("files.uploaded");
 
-			counterService.increment("files.uploaded");
+					gaugeService.submit("files.uploaded.lastBytes",
+						file.headers().getContentLength());
 
-			gaugeService.submit("files.uploaded.lastBytes",
-				file.getSize());
+					inMemoryMetricRepository.increment(
+						new Delta<Number>("files.uploaded.totalBytes",
+							file.headers().getContentLength()));
+				});
 
-			inMemoryMetricRepository.increment(
-				new Delta<Number>("files.uploaded.totalBytes",
-					file.getSize()));
-		}
+				return Mono.when(saveDatabaseImage, copyFile, countFile)
+					.log("createImage-when");
+			})
+			.log("createImage-flatMap")
+			.then()
+			.log("createImage-done");
 	}
 	// end::metric-2[]
 
-	public void deleteImage(String filename) throws IOException {
+	public Mono<Void> deleteImage(String filename) {
+		Mono<Void> deleteDatabaseImage = imageRepository
+			.findByName(filename)
+			.log("deleteImage-find")
+			.flatMap(imageRepository::delete)
+			.log("deleteImage-record");
 
-		final Image byName = repository.findByName(filename);
-		repository.delete(byName);
-		Files.deleteIfExists(Paths.get(UPLOAD_ROOT, filename));
+		Mono<Void> deleteFile = Mono.fromRunnable(() -> {
+			try {
+				Files.deleteIfExists(Paths.get(UPLOAD_ROOT, filename));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		})
+			.log("deleteImage-file");
+
+		return Mono.when(deleteDatabaseImage, deleteFile)
+			.log("deleteImage-when")
+			.then()
+			.log("deleteImage-done");
 	}
 
+	/**
+	 * Pre-load some fake images
+	 *
+	 * @return Spring Boot {@link CommandLineRunner} automatically run after app context is loaded.
+	 */
 	@Bean
-	CommandLineRunner setUp(ImageRepository repository) throws IOException {
-
-		return args -> {
+	CommandLineRunner setUp() throws IOException {
+		return (args) -> {
 			FileSystemUtils.deleteRecursively(new File(UPLOAD_ROOT));
 
 			Files.createDirectory(Paths.get(UPLOAD_ROOT));
 
-			repository.deleteAll();
+			FileCopyUtils.copy("Test file",
+				new FileWriter(UPLOAD_ROOT +
+					"/learning-spring-boot-cover.jpg"));
 
-			FileCopyUtils.copy("Test file", new FileWriter(UPLOAD_ROOT + "/test"));
-			repository.save(new Image(UUID.randomUUID().toString(), "test"));
+			FileCopyUtils.copy("Test file2",
+				new FileWriter(UPLOAD_ROOT +
+					"/learning-spring-boot-2nd-edition-cover.jpg"));
 
-			FileCopyUtils.copy("Test file2", new FileWriter(UPLOAD_ROOT + "/test2"));
-			repository.save(new Image(UUID.randomUUID().toString(), "test2"));
-
-			FileCopyUtils.copy("Test file3", new FileWriter(UPLOAD_ROOT + "/test3"));
-			repository.save(new Image(UUID.randomUUID().toString(), "test3"));
+			FileCopyUtils.copy("Test file3",
+				new FileWriter(UPLOAD_ROOT + "/bazinga.png"));
 		};
-
 	}
 
 }

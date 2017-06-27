@@ -15,14 +15,15 @@
  */
 package com.greglturnquist.learningspringboot;
 
-import com.greglturnquist.learningspringboot.images.Comment;
-import com.greglturnquist.learningspringboot.images.ImageRepository;
-import com.greglturnquist.learningspringboot.images.CommentController;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import com.greglturnquist.learningspringboot.images.Comment;
+import com.greglturnquist.learningspringboot.images.CommentController;
+import com.greglturnquist.learningspringboot.images.ImageRepository;
 
 /**
  * @author Greg Turnquist
@@ -46,13 +47,14 @@ public class CommentSimulator {
 
 	@Scheduled(fixedRate = 100)
 	public void simulateActivity() {
-		repository.findAll().forEach(image -> {
+		repository.findAll().map(image -> {
 			Comment comment = new Comment();
 			comment.setImageId(image.getId());
 			comment.setComment(
 				"Comment #" + counter.getAndIncrement());
-			controller.addComment(comment);
-		});
+			return controller.addComment(comment);
+		})
+			.subscribe();
 	}
 }
 // end::tag[]

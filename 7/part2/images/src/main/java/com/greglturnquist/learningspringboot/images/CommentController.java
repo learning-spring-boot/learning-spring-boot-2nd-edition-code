@@ -15,6 +15,8 @@
  */
 package com.greglturnquist.learningspringboot.images;
 
+import reactor.core.publisher.Mono;
+
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.messaging.Source;
@@ -43,17 +45,19 @@ public class CommentController {
 	}
 
 	@PostMapping("/comments")
-	public String addComment(Comment newComment) {
-		System.out.println("Processing new comment " + newComment.toString());
-		source.output().send(MessageBuilder
-			.withPayload(newComment)
-			.setHeader(MessageHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-			.build());
-		counterService.increment("comments.total.produced");
-		counterService.increment(
-			"comments." + newComment.getImageId() + ".produced");
-		return "redirect:/";
+	public Mono<String> addComment(Comment newComment) {
+		return Mono.fromRunnable(() -> source.output().send(
+			MessageBuilder
+				.withPayload(newComment)
+				.setHeader(MessageHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+				.build())
+		)
+			.map(aVoid -> {
+				counterService.increment("comments.total.produced");
+				counterService.increment(
+					"comments." + newComment.getImageId() + ".produced");
+				return "redirect:/";
+			});
 	}
-
 }
 // end::code[]
