@@ -15,12 +15,12 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
@@ -45,17 +45,17 @@ public class CommentService {
 	}
 
 	// tag::stream-2[]
-	@StreamListener(Sink.INPUT)
-	public void save(Comment newComment) {
-		repository
-			.save(Mono.just(newComment))
-			.thenEmpty(subscriber -> {
+	public Mono<Void> save(Flux<Comment> newComment) {
+		return repository
+			.saveAll(newComment)
+			.map(comment -> {
 				counterService.increment(
 					"comments.total.consumed");
 				counterService.increment(
-					"comments." + newComment.getImageId() + ".consumed");
+					"comments." + comment.getImageId() + ".consumed");
+				return comment;
 			})
-			.subscribe();
+			.then();
 	}
 	// end::stream-2[]
 

@@ -47,10 +47,11 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-devtools')
 	compile('org.projectlombok:lombok')
 	compile('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
+	compile('org.springframework.cloud:spring-cloud-stream-reactive')
 	compile('org.springframework.cloud:spring-cloud-starter-eureka')
 	compile('org.springframework.cloud:spring-cloud-starter-hystrix')
 	compile('org.springframework.cloud:spring-cloud-starter-config')
-	compile('org.springframework.boot:spring-boot-starter-websocket')
+	compile('org.springframework:spring-messaging')
 
 	compile('org.webjars:requirejs:2.2.0')
 	compile('org.webjars.npm:stompjs:2.3.3') {

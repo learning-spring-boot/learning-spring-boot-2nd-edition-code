@@ -15,16 +15,16 @@
  */
 package com.greglturnquist.learningspringboot;
 
-import com.greglturnquist.learningspringboot.images.CommentHelper;
-import com.greglturnquist.learningspringboot.images.Image;
-import com.greglturnquist.learningspringboot.images.ImageService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import java.util.HashMap;
+
+import reactor.core.publisher.Mono;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.HashMap;
+import com.greglturnquist.learningspringboot.images.CommentHelper;
+import com.greglturnquist.learningspringboot.images.ImageService;
 
 /**
  * @author Greg Turnquist
@@ -45,23 +45,18 @@ public class HomeController {
 	// end::injection[]
 
 	@GetMapping("/")
-	public String index(Model model, Pageable pageable) {
-		final Page<Image> page = imageService.findPage(pageable);
-
-		model.addAttribute("page",
-			page.map(image -> new HashMap<String, Object>(){{
-				put("id", image.getId());
-				put("name", image.getName());
-				// tag::comments[]
-				put("comments", commentHelper.getComments(image));
-				// end::comments[]
-			}}));
-		if (page.hasPrevious()) {
-			model.addAttribute("prev", pageable.previousOrFirst());
-		}
-		if (page.hasNext()) {
-			model.addAttribute("next", pageable.next());
-		}
-		return "index";
+	public Mono<String> index(Model model) {
+		model.addAttribute("images",
+			imageService
+				.findAllImages()
+				.map(image -> new HashMap<String, Object>() {{
+					put("id", image.getId());
+					put("name", image.getName());
+					// tag::comments[]
+					put("comments", commentHelper.getComments(image));
+					// end::comments[]
+				}})
+		);
+		return Mono.just("index");
 	}
 }

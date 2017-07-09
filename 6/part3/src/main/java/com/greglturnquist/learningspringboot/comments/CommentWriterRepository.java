@@ -15,6 +15,7 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import org.springframework.data.repository.Repository;
@@ -26,7 +27,7 @@ import org.springframework.data.repository.Repository;
 public interface CommentWriterRepository
 	extends Repository<Comment, String> {
 
-	Mono<Comment> save(Mono<Comment> newComment);
+	Flux<Comment> saveAll(Flux<Comment> newComment);
 
 	// Needed to support save()
 	Mono<Comment> findOne(String id);

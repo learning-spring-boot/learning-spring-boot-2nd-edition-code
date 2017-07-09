@@ -42,5 +42,5 @@ dependencies {
 	compile('org.projectlombok:lombok')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
-	testCompile("io.projectreactor.addons:reactor-test")
+	testCompile("io.projectreactor:reactor-test")
 }

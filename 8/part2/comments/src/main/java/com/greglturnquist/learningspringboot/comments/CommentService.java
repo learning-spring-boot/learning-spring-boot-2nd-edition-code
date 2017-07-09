@@ -15,8 +15,8 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Flux;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.cloud.stream.annotation.EnableBinding;
@@ -36,8 +36,6 @@ import org.springframework.stereotype.Service;
 public class CommentService {
 	// end::stream-1[]
 
-	private final static Logger log = LoggerFactory.getLogger(CommentService.class);
-
 	private final CommentRepository repository;
 
 	private final CounterService counterService;
@@ -51,19 +49,23 @@ public class CommentService {
 	// tag::stream-2[]
 	@StreamListener(Sink.INPUT)
 	@SendTo(Source.OUTPUT)
-	public Comment save(Comment newComment) {
-		log.info("Saving new comment " + newComment.toString());
-		counterService.increment("comments.total.consumed");
-		counterService.increment(
-			"comments." + newComment.getImageId() + ".consumed");
-		return repository.save(newComment);
+	public Flux<Comment> save(Flux<Comment> newComment) {
+		return repository
+			.saveAll(newComment)
+			.map(comment -> {
+				counterService.increment(
+					"comments.total.consumed");
+				counterService.increment(
+					"comments." + comment.getImageId() + ".consumed");
+				return comment;
+			});
 	}
 	// end::stream-2[]
 
 	@Bean
 	CommandLineRunner setUp(CommentRepository repository) {
 		return args -> {
-			repository.deleteAll();
+			repository.deleteAll().subscribe();
 		};
 	}
 }

@@ -15,19 +15,20 @@
  */
 package com.greglturnquist.learningspringboot.images;
 
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.session.Session;
-import org.springframework.session.SessionRepository;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
+import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.*;
+
+import java.io.IOException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
-import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.*;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.session.Session;
+import org.springframework.session.SessionRepository;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * @author Greg Turnquist
@@ -53,7 +54,7 @@ public class SpringSessionSecurityContextFilter
 		String sessionId = request.getHeader("SESSION");
 		if (sessionId != null) {
 			Session session =
-				sessionRepository.getSession(sessionId);
+				sessionRepository.findById(sessionId);
 			if (session != null) {
 				SecurityContextHolder.setContext(
 					session.getAttribute(

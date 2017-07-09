@@ -15,21 +15,22 @@
  */
 package com.greglturnquist.learningspringboot;
 
-import com.greglturnquist.learningspringboot.images.CommentHelper;
-import com.greglturnquist.learningspringboot.images.Image;
-import com.greglturnquist.learningspringboot.images.ImageService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import reactor.core.publisher.Mono;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpSession;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import com.greglturnquist.learningspringboot.images.CommentHelper;
+import com.greglturnquist.learningspringboot.images.ImageService;
 
 /**
  * @author Greg Turnquist
@@ -50,31 +51,26 @@ public class HomeController {
 	// end::injection[]
 
 	@GetMapping("/")
-	public String index(Model model, Pageable pageable,
-						@RequestHeader("SESSION") String sessionId) {
-		final Page<Image> page = imageService.findPage(pageable);
-
+	public Mono<String> index(Model model,
+			  @RequestHeader("SESSION") String sessionId) {
 		// tag::owner[]
-		model.addAttribute("page",
-			page.map(image -> new HashMap<String, Object>(){{
-				put("id", image.getId());
-				put("name", image.getName());
-				put("owner", image.getOwner());
-				put("comments", commentHelper.getComments(image, sessionId));
-			}}));
+		model.addAttribute("images",
+			imageService
+				.findAllImages()
+				.map(image -> new HashMap<String, Object>() {{
+					put("id", image.getId());
+					put("name", image.getName());
+					put("owner", image.getOwner());
+					put("comments", commentHelper.getComments(image, sessionId));
+				}})
+		);
 		// end::owner[]
-		if (page.hasPrevious()) {
-			model.addAttribute("prev", pageable.previousOrFirst());
-		}
-		if (page.hasNext()) {
-			model.addAttribute("next", pageable.next());
-		}
-		return "index";
+		return Mono.just("index");
 	}
 
 	@GetMapping("/token")
 	@ResponseBody
-	public Map<String, String> token(HttpSession session) {
-		return Collections.singletonMap("token", session.getId());
+	public Mono<Map<String, String>> token(HttpSession session) {
+		return Mono.just(Collections.singletonMap("token", session.getId()));
 	}
 }

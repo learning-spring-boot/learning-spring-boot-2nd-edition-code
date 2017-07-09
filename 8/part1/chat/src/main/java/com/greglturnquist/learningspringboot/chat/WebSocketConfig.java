@@ -15,37 +15,52 @@
  */
 package com.greglturnquist.learningspringboot.chat;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import reactor.core.publisher.Mono;
+
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.reactive.HandlerMapping;
+import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
+import org.springframework.web.reactive.socket.WebSocketHandler;
+import org.springframework.web.reactive.socket.WebSocketSession;
+import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter;
 
 /**
  * @author Greg Turnquist
  */
 // tag::websocket-1[]
 @Configuration
-@EnableWebSocketMessageBroker
-public class WebSocketConfig extends
-	AbstractWebSocketMessageBrokerConfigurer {
+public class WebSocketConfig {
 // end::websocket-1[]
 
-	// tag::websocket-2[]
-	@Override
-	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/learning-spring-boot")
-			.setAllowedOrigins("http://localhost:8080")
-			.withSockJS();
-	}
-	// end::websocket-2[]
+	@Bean
+	HandlerMapping webSocketMapping() {
+		Map<String, WebSocketHandler> map = new HashMap<>();
+		map.put("/topic/comments.new", new NewCommentHandler());
 
-	// tag::websocket-3[]
-	@Override
-	public void configureMessageBroker(MessageBrokerRegistry registry) {
-		registry.setApplicationDestinationPrefixes("/app");
-		registry.enableSimpleBroker("/topic");
+		SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
+		mapping.setUrlMap(map);
+		
+		return mapping;
 	}
-	// end::websocket-3[]
 
+	@Bean
+	WebSocketHandlerAdapter handlerAdapter() {
+		return new WebSocketHandlerAdapter();
+	}
+
+	static class NewCommentHandler implements WebSocketHandler {
+		@Override
+		public Mono<Void> handle(WebSocketSession session) {
+			return session.send(session.receive()
+				.map(webSocketMessage -> {
+					System.out.println(webSocketMessage.getPayloadAsText());
+					return webSocketMessage;
+				}))
+				.then();
+		}
+	}
 }

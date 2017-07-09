@@ -17,6 +17,8 @@ package com.greglturnquist.learningspringboot.images;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Mono;
+
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.messaging.Source;
@@ -48,16 +50,19 @@ public class CommentController {
 	}
 
 	@PostMapping("/comments")
-	public ResponseEntity<?> addComment(Comment newComment) {
-		log.debug("Processing new comment " + newComment.toString());
-		source.output().send(MessageBuilder
-			.withPayload(newComment)
-			.setHeader(MessageHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-			.build());
-		counterService.increment("comments.total.produced");
-		counterService.increment(
-			"comments." + newComment.getImageId() + ".produced");
-		return ResponseEntity.noContent().build();
+	public Mono<ResponseEntity<?>> addComment(Comment newComment) {
+		return Mono.fromRunnable(() -> source.output().send(
+			MessageBuilder
+				.withPayload(newComment)
+				.setHeader(MessageHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+				.build())
+		)
+			.map(aVoid -> {
+				counterService.increment("comments.total.produced");
+				counterService.increment(
+					"comments." + newComment.getImageId() + ".produced");
+				return ResponseEntity.noContent().build();
+			});
 	}
 
 }

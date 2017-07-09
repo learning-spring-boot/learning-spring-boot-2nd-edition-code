@@ -43,7 +43,7 @@ dependencies {
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	// end::test-1[]
 	// tag::test-2[]
-	testCompile("io.projectreactor.addons:reactor-test")
+	testCompile("io.projectreactor:reactor-test")
 	// end::test-2[]
 	// tag::test-3[]
 	testCompile("de.flapdoodle.embed:de.flapdoodle.embed.mongo")

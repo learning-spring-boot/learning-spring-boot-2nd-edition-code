@@ -29,7 +29,7 @@ public interface CommentRepository
 
 	Flux<Comment> findByImageId(String imageId);
 
-	Mono<Comment> save(Mono<Comment> newComment);
+	Flux<Comment> saveAll(Flux<Comment> newComment);
 
 	// Required to support save()
 	Mono<Comment> findOne(String id);

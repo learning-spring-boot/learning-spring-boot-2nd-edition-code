@@ -15,16 +15,16 @@
  */
 package com.greglturnquist.learningspringboot;
 
-import com.greglturnquist.learningspringboot.images.Comment;
-import com.greglturnquist.learningspringboot.images.ImageRepository;
-import com.greglturnquist.learningspringboot.images.CommentController;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.support.BindingAwareModelMap;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import com.greglturnquist.learningspringboot.images.Comment;
+import com.greglturnquist.learningspringboot.images.CommentController;
+import com.greglturnquist.learningspringboot.images.ImageRepository;
 
 /**
  * @author Greg Turnquist
@@ -51,20 +51,20 @@ public class CommentSimulator {
 
 	@Scheduled(fixedRate = 100)
 	public void simulateActivity() {
-		repository.findAll().forEach(image -> {
+		repository.findAll().map(image -> {
 			Comment comment = new Comment();
 			comment.setImageId(image.getId());
 			comment.setComment(
 				"Comment #" + counter.getAndIncrement());
-			commentController.addComment(comment);
-		});
+			return commentController.addComment(comment);
+		})
+			.subscribe();
 	}
 
 	@Scheduled(fixedRate = 500)
 	public void simulateUsersClicking() {
 		homeController.index(
-			new BindingAwareModelMap(),
-			new PageRequest(0, 20));
+			new BindingAwareModelMap());
 	}
 }
 // end::tag[]

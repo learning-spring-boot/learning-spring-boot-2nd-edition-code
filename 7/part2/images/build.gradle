@@ -48,6 +48,7 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-devtools')
 
 	compile('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
+	compile('org.springframework.cloud:spring-cloud-stream-reactive')
 	// tag::deps[]
 	compile('org.springframework.cloud:spring-cloud-starter-eureka')
 	compile('org.springframework.cloud:spring-cloud-starter-hystrix')
@@ -55,7 +56,7 @@ dependencies {
 
 	compile('org.projectlombok:lombok')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
-	testCompile("io.projectreactor.addons:reactor-test")
+	testCompile("io.projectreactor:reactor-test")
 }
 
 dependencyManagement {

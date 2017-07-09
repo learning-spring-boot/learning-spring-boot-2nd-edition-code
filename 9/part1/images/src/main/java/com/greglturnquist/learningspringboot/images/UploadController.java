@@ -15,27 +15,28 @@
  */
 package com.greglturnquist.learningspringboot.images;
 
+import java.io.IOException;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * @author Greg Turnquist
  */
-// tag::headline[]
-@RestController
+@Controller
 public class UploadController {
-	// end::headline[]
 
 	private static final String BASE_PATH = "/images";
 	private static final String FILENAME = "{filename:.+}";
@@ -47,45 +48,38 @@ public class UploadController {
 	}
 
 	@GetMapping(BASE_PATH + "/" + FILENAME + "/raw")
-	public ResponseEntity<?> oneRawImage(@PathVariable String filename) {
-
-		try {
-			Resource file = imageService.findOneImage(filename);
-			return ResponseEntity.ok()
-				.contentLength(file.contentLength())
-				.contentType(MediaType.IMAGE_JPEG)
-				.body(new InputStreamResource(file.getInputStream()));
-		} catch (IOException e) {
-			return ResponseEntity.badRequest()
-				.body("Couldn't find " + filename + " => " + e.getMessage());
-		}
-
+	@ResponseBody
+	public Mono<ResponseEntity<?>> oneRawImage(
+		@PathVariable String filename) {
+		// tag::try-catch[]
+		return imageService.findOneImage(filename)
+			.map(resource -> {
+				try {
+					return ResponseEntity.ok()
+						.contentLength(resource.contentLength())
+						.contentType(MediaType.IMAGE_JPEG)
+						.body(new InputStreamResource(
+							resource.getInputStream()));
+				} catch (IOException e) {
+					return ResponseEntity.badRequest()
+						.body("Couldn't find " + filename +
+							" => " + e.getMessage());
+				}
+			});
+		// end::try-catch[]
 	}
 
 	@PostMapping(value = BASE_PATH)
-	public ResponseEntity<?> createFile(@RequestParam("file") MultipartFile file) {
-		try {
-			imageService.createImage(file);
-			return ResponseEntity.ok(
-				"Successfully uploaded " + file.getName());
-		} catch (IOException e) {
-			return ResponseEntity.badRequest().body(
-				"Failed to upload " + file.getName() + " => " + e.getMessage());
-		}
+	public Mono<String> createFile(@RequestPart(name = "file")
+									   Flux<FilePart> files) {
+		return imageService.createImage(files)
+			.map(aVoid -> "redirect:/");
 	}
 
 	@DeleteMapping(BASE_PATH + "/" + FILENAME)
-	public ResponseEntity<?> deleteFile(
-		@PathVariable String filename) {
-		try {
-			imageService.deleteImage(filename);
-			return ResponseEntity.ok(
-				"Successfully deleted " + filename);
-		} catch (IOException|RuntimeException e) {
-			return ResponseEntity.badRequest().body(
-				"Failed to delete " + filename + " => "
-									+ e.getMessage());
-		}
+	public Mono<String> deleteFile(@PathVariable String filename) {
+		return imageService.deleteImage(filename)
+			.map(aVoid -> "redirect:/");
 	}
 
 }

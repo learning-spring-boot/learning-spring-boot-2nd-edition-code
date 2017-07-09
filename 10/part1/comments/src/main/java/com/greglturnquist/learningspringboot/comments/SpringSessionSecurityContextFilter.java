@@ -15,18 +15,19 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
+import java.io.IOException;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 /**
  * @author Greg Turnquist
@@ -46,7 +47,7 @@ public class SpringSessionSecurityContextFilter extends OncePerRequestFilter {
 									FilterChain filterChain) throws ServletException, IOException {
 		String sessionId = request.getHeader("SESSION");
 		if (sessionId != null) {
-			Session session = sessionRepository.getSession(sessionId);
+			Session session = sessionRepository.findById(sessionId);
 			if (session != null) {
 				SecurityContextHolder.setContext(
 					session.getAttribute(
