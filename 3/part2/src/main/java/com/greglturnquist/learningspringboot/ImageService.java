@@ -100,7 +100,7 @@ public class ImageService {
 			.flatMap(imageRepository::delete)
 			.log("deleteImage-record");
 
-		Mono<Void> deleteFile = Mono.fromRunnable(() -> {
+		Mono<Object> deleteFile = Mono.fromRunnable(() -> {
 			try {
 				Files.deleteIfExists(Paths.get(UPLOAD_ROOT, filename));
 			} catch (IOException e) {

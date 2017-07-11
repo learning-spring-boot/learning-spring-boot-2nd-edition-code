@@ -40,6 +40,8 @@ jar {
 	version = '0.0.1-SNAPSHOT'
 }
 
+ext['thymeleaf-spring5.version'] = '3.0.7-SNAPSHOT'
+
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')
 	compile('org.springframework.boot:spring-boot-starter-actuator')
@@ -52,10 +54,6 @@ dependencies {
 	compile('org.springframework.cloud:spring-cloud-starter-eureka')
 	compile('org.springframework.cloud:spring-cloud-starter-hystrix')
 	compile('org.springframework.cloud:spring-cloud-starter-config')
-
-	// tag::websocket[]
-	compile('org.springframework:spring-messaging')
-	// end::websocket[]
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }

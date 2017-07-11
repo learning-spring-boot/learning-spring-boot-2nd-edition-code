@@ -22,6 +22,7 @@ import reactor.core.publisher.Mono;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.web.reactive.HandlerMapping;
 import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.reactive.socket.WebSocketHandler;
@@ -37,9 +38,9 @@ public class WebSocketConfig {
 // end::websocket-1[]
 
 	@Bean
-	HandlerMapping webSocketMapping() {
+	HandlerMapping webSocketMapping(CommentService commentService) {
 		Map<String, WebSocketHandler> map = new HashMap<>();
-		map.put("/topic/comments.new", new NewCommentHandler());
+		map.put("/topic/comments.new", commentService);
 
 		SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
 		mapping.setUrlMap(map);
@@ -52,15 +53,8 @@ public class WebSocketConfig {
 		return new WebSocketHandlerAdapter();
 	}
 
-	static class NewCommentHandler implements WebSocketHandler {
-		@Override
-		public Mono<Void> handle(WebSocketSession session) {
-			return session.send(session.receive()
-				.map(webSocketMessage -> {
-					System.out.println(webSocketMessage.getPayloadAsText());
-					return webSocketMessage;
-				}))
-				.then();
-		}
+	@Bean
+	Jackson2JsonEncoder jackson2JsonEncoder() {
+		return new Jackson2JsonEncoder();
 	}
 }

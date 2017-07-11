@@ -15,10 +15,11 @@
  */
 package com.greglturnquist.learningspringboot;
 
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Sort;
 
 /**
  * @author Greg Turnquist

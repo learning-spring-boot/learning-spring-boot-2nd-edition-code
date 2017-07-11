@@ -29,7 +29,7 @@ public interface CommentWriterRepository
 	Mono<Comment> save(Mono<Comment> newComment);
 
 	// Needed to support save()
-	Mono<Comment> findOne(String id);
+	Mono<Comment> findById(String id);
 
 	Mono<Void> deleteAll();
 }

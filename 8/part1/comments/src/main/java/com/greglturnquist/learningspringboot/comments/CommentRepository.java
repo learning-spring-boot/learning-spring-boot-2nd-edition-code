@@ -32,7 +32,7 @@ public interface CommentRepository
 	Flux<Comment> saveAll(Flux<Comment> newComment);
 
 	// Required to support save()
-	Mono<Comment> findOne(String id);
+	Mono<Comment> findById(String id);
 
 	Mono<Void> deleteAll();
 }

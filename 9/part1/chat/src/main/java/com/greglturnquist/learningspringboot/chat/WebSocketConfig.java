@@ -16,46 +16,40 @@
 package com.greglturnquist.learningspringboot.chat;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;
-import org.springframework.security.config.annotation.web.socket.AbstractSecurityWebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
 /**
  * @author Greg Turnquist
  */
 // tag::secured-1[]
 @Configuration
-@EnableWebSocketMessageBroker
-public class WebSocketConfig extends
-	AbstractSecurityWebSocketMessageBrokerConfigurer {
+//@EnableWebSocketMessageBroker
+public class WebSocketConfig /*extends AbstractSecurityWebSocketMessageBrokerConfigurer*/ {
 	// end::secured-1[]
 
 	// tag::cors[]
-	@Override
-	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/learning-spring-boot").withSockJS();
-	}
-	// end::cors[]
-
-	@Override
-	public void configureMessageBroker(MessageBrokerRegistry registry) {
-		registry.setApplicationDestinationPrefixes("/app");
-		registry.enableSimpleBroker("/topic", "/queue");
-	}
+//	@Override
+//	public void registerStompEndpoints(StompEndpointRegistry registry) {
+//		registry.addEndpoint("/learning-spring-boot").withSockJS();
+//	}
+//	// end::cors[]
+//
+//	@Override
+//	public void configureMessageBroker(MessageBrokerRegistry registry) {
+//		registry.setApplicationDestinationPrefixes("/app");
+//		registry.enableSimpleBroker("/topic", "/queue");
+//	}
 
 	// tag::secured-2[]
-	@Override
-	protected void configureInbound(
-		MessageSecurityMetadataSourceRegistry messages) {
-
-		messages
-			.nullDestMatcher().authenticated()
-			.simpDestMatchers("/app/**").hasRole("USER")
-			.simpSubscribeDestMatchers(
-				"/user/**", "/topic/**").hasRole("USER")
-			.anyMessage().denyAll();
-	}
+//	@Override
+//	protected void configureInbound(
+//		MessageSecurityMetadataSourceRegistry messages) {
+//
+//		messages
+//			.nullDestMatcher().authenticated()
+//			.simpDestMatchers("/app/**").hasRole("USER")
+//			.simpSubscribeDestMatchers(
+//				"/user/**", "/topic/**").hasRole("USER")
+//			.anyMessage().denyAll();
+//	}
 	// end::secured-2[]
 }
