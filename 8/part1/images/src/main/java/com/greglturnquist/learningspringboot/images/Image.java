@@ -18,28 +18,16 @@ package com.greglturnquist.learningspringboot.images;
 import lombok.Data;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * @author Greg Turnquist
  */
 @Data
+@Document
 public class Image {
 
-	@Id
-	private String id;
-
-	private String name;
-
-	public Image(String id, String name) {
-		this.name = name;
-	}
-
-	public String getId() {
-		return this.id;
-	}
-
-	public String getName() {
-		return this.name;
-	}
+	@Id private final String id;
+	private final String name;
 
 }
