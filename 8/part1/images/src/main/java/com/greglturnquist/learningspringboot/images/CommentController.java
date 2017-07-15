@@ -54,13 +54,13 @@ public class CommentController {
 				.withPayload(newComment)
 				.setHeader(MessageHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
 				.build())
-		)
-			.map(aVoid -> {
+			)
+			.then(Mono.fromRunnable(() -> {
 				counterService.increment("comments.total.produced");
 				counterService.increment(
 					"comments." + newComment.getImageId() + ".produced");
-				return ResponseEntity.noContent().build();
-			});
+			}))
+			.then(Mono.just(ResponseEntity.noContent().build()));
 	}
 	// end::rest[]
 

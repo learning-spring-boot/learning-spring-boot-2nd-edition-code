@@ -41,7 +41,7 @@ public class CommentController {
 				"learning-spring-boot",
 				"comments.new", newComment)
 		)
-		.map(aVoid -> "redirect:/");
+		.then(Mono.just("redirect:/"));
 	}
 
 }

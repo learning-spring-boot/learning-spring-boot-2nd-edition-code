@@ -15,6 +15,8 @@
  */
 package com.greglturnquist.learningspringboot;
 
+import java.util.HashMap;
+
 import reactor.core.publisher.Mono;
 
 import org.springframework.stereotype.Controller;
@@ -44,20 +46,16 @@ public class HomeController {
 
 	@GetMapping("/")
 	public Mono<String> index(Model model) {
-//		model.addAttribute("images",
-//			imageService
-//				.findAllImages()
-//				.map(image -> new HashMap<String, Object>() {{
-//					put("id", image.getId());
-//					put("name", image.getName());
-//					// tag::comments[]
-//					put("comments", commentHelper.getComments(image));
-//					// end::comments[]
-//				}})
-//		);
 		model.addAttribute("images",
 			imageService
 				.findAllImages()
+				.map(image -> new HashMap<String, Object>() {{
+					put("id", image.getId());
+					put("name", image.getName());
+					// tag::comments[]
+					put("comments", commentHelper.getComments(image));
+					// end::comments[]
+				}})
 		);
 		return Mono.just("index");
 	}

@@ -18,15 +18,12 @@ package com.greglturnquist.learningspringboot.chat;
 import java.util.HashMap;
 import java.util.Map;
 
-import reactor.core.publisher.Mono;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.codec.json.Jackson2JsonEncoder;
+import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.reactive.HandlerMapping;
 import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.reactive.socket.WebSocketHandler;
-import org.springframework.web.reactive.socket.WebSocketSession;
 import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter;
 
 /**
@@ -39,22 +36,24 @@ public class WebSocketConfig {
 
 	@Bean
 	HandlerMapping webSocketMapping(CommentService commentService) {
-		Map<String, WebSocketHandler> map = new HashMap<>();
-		map.put("/topic/comments.new", commentService);
+		Map<String, WebSocketHandler> urlMap = new HashMap<>();
+		urlMap.put("/topic/comments.new", commentService);
+
+		Map<String, CorsConfiguration> corsConfigurationMap = new HashMap<>();
+		CorsConfiguration corsConfiguration = new CorsConfiguration();
+		corsConfiguration.addAllowedOrigin("http://localhost:8080");
+		corsConfigurationMap.put("/topic/comments.new", corsConfiguration);
 
 		SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
-		mapping.setUrlMap(map);
-		
+		mapping.setOrder(10);
+		mapping.setUrlMap(urlMap);
+		mapping.setCorsConfigurations(corsConfigurationMap);
+
 		return mapping;
 	}
 
 	@Bean
 	WebSocketHandlerAdapter handlerAdapter() {
 		return new WebSocketHandlerAdapter();
-	}
-
-	@Bean
-	Jackson2JsonEncoder jackson2JsonEncoder() {
-		return new Jackson2JsonEncoder();
 	}
 }

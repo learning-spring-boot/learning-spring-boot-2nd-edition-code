@@ -81,14 +81,14 @@ public class HomeController {
 	public Mono<String> createFile(@RequestPart(name = "file")
 										   Flux<FilePart> files) {
 		return imageService.createImage(files)
-			.map(aVoid -> "redirect:/");
+			.then(Mono.just("redirect:/"));
 	}
 
 	@DeleteMapping(BASE_PATH + "/" + FILENAME)
 	public Mono<String> deleteFile(@PathVariable String filename) {
 		return imageService.deleteImage(filename)
 			.log("delete-image")
-			.map(aVoid -> "redirect:/");
+			.then(Mono.just("redirect:/"));
 	}
 
 }

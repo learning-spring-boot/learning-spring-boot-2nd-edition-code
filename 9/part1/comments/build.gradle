@@ -39,6 +39,11 @@ jar {
 	version = '0.0.1-SNAPSHOT'
 }
 
+configurations {
+	all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+	all*.exclude group: 'org.springframework', module: 'spring-webmvc'
+}
+
 ext['reactor.version'] = '3.0.3.RELEASE'
 
 dependencies {

@@ -24,11 +24,12 @@ import reactor.core.publisher.Mono;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.messaging.Sink;
-import org.springframework.core.ResolvableType;
-import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketSession;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Greg Turnquist
@@ -41,13 +42,12 @@ public class CommentService implements WebSocketHandler {
 	private final static Logger log =
 		LoggerFactory.getLogger(CommentService.class);
 
+	private ObjectMapper mapper;
 	private Flux<Comment> flux;
 	private FluxSink<Comment> webSocketCommentSink;
 
-	private Jackson2JsonEncoder encoder;
-
-	CommentService(Jackson2JsonEncoder encoder) {
-		this.encoder = encoder;
+	CommentService(ObjectMapper mapper) {
+		this.mapper = mapper;
 		this.flux = Flux.<Comment>create(
 			emitter -> this.webSocketCommentSink = emitter,
 			FluxSink.OverflowStrategy.IGNORE)
@@ -57,22 +57,27 @@ public class CommentService implements WebSocketHandler {
 
 	@StreamListener(Sink.INPUT)
 	public void broadcast(Comment comment) {
-		log.info("Publishing " + comment.toString() +
-			" to websocket...");
-		webSocketCommentSink.next(comment);
+		if (webSocketCommentSink != null) {
+			log.info("Publishing " + comment.toString() +
+				" to websocket...");
+			webSocketCommentSink.next(comment);
+		}
 	}
 
 	@Override
 	public Mono<Void> handle(WebSocketSession session) {
-
-		return session.send(encoder
-			.encode(
-				this.flux,
-				session.bufferFactory(),
-				ResolvableType.forClass(Comment.class),
-				null,
-				null)
-			.map(dataBuffer -> session.binaryMessage(dataBufferFactory -> dataBuffer)));
+		return session.send(this.flux
+			.map(comment -> {
+				try {
+					return mapper.writeValueAsString(comment);
+				} catch (JsonProcessingException e) {
+					throw new RuntimeException(e);
+				}
+			})
+			.log("encode-as-json")
+			.map(session::textMessage)
+			.log("wrap-as-websocket-message"))
+		.log("publish-to-websocket");
 	}
 
 }

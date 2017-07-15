@@ -15,18 +15,23 @@
  */
 package com.greglturnquist.learningspringboot.chat;
 
+import reactor.core.publisher.Mono;
+
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.reactive.socket.WebSocketHandler;
+import org.springframework.web.reactive.socket.WebSocketMessage;
+import org.springframework.web.reactive.socket.WebSocketSession;
 
 /**
  * @author Greg Turnquist
  */
 // tag::code[]
 @Controller
-public class ChatController {
+public class ChatController implements WebSocketHandler {
 
 	private final SimpMessagingTemplate template;
 
@@ -42,5 +47,17 @@ public class ChatController {
 		return headerAccessor.getSessionId()+ ": " + newChatMessage;
 	}
 
+	@Override
+	public Mono<Void> handle(WebSocketSession session) {
+		String sessionId = session.getHandshakeInfo()
+			.getHeaders().get("simpSessionId").get(0);
+
+		return session.send(
+			session
+				.receive()
+				.map(WebSocketMessage::getPayloadAsText)
+				.map(s -> sessionId + ": " + s)
+				.map(session::textMessage));
+	}
 }
 // end::code[]

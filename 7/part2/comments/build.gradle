@@ -39,7 +39,10 @@ jar {
 	version = '0.0.1-SNAPSHOT'
 }
 
-ext['reactor.version'] = '3.0.3.RELEASE'
+configurations {
+	all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+	all*.exclude group: 'org.springframework', module: 'spring-webmvc'
+}
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')

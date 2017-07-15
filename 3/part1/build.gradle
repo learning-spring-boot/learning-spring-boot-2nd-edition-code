@@ -36,7 +36,7 @@ ext['thymeleaf-spring5.version'] = '3.0.7-SNAPSHOT'
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')
-	compile('org.synchronoss.cloud:nio-multipart-parser:1.0.2')
+	compile('org.synchronoss.cloud:nio-multipart-parser:1.1.0')
 	// tag::dep-1[]
 	compile('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
 	// end::dep-1[]
