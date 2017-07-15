@@ -98,13 +98,14 @@
                     }
 
                     <!-- tag::chat-2[] -->
-                    var chatMessages = new WebSocket('ws://localhost:8200/topic/chatMessage.new');
+                    var outboundChatMessages = new WebSocket('ws://localhost:8200/app/chatMessage.new');
                     // Post new chat messages
-                    chatMessages.onopen = function(event) {
+                    outboundChatMessages.onopen = function(event) {
                         document.getElementById('chatButton')
                             .addEventListener('click', function () {
                                 var chatInput = document.getElementById('chatInput');
-                                chatMessages.send(chatInput.value);
+                                console.log('Publishing "' + chatInput.value + '"');
+                                outboundChatMessages.send(chatInput.value);
                                 chatInput.value = '';
                                 chatInput.focus();
                             });
@@ -112,8 +113,10 @@
                     <!-- end::chat-2[] -->
 
                     <!-- tag::chat-3[] -->
+    				var inboundChatMessages = new WebSocket('ws://localhost:8200/topic/chatMessage.new');
                     // Listen for new chat messages
-                    chatMessages.onmessage = function(event) {
+				    inboundChatMessages.onmessage = function(event) {
+                    	console.log('Received ' + event.data);
                         var chatDisplay = document.getElementById('chatDisplay');
                         chatDisplay.value = chatDisplay.value + event.data + '\n';
                     };

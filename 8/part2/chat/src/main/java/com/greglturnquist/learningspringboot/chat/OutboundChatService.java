@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,56 +27,42 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketSession;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Greg Turnquist
  */
-// tag::code[]
 @Service
 @EnableBinding(ChatServiceStreams.class)
-public class CommentService implements WebSocketHandler {
+public class OutboundChatService implements WebSocketHandler {
 
 	private final static Logger log =
 		LoggerFactory.getLogger(CommentService.class);
 
-	private ObjectMapper mapper;
-	private Flux<Comment> flux;
-	private FluxSink<Comment> webSocketCommentSink;
+	private Flux<String> flux;
+	private FluxSink<String> chatMessageSink;
 
-	CommentService(ObjectMapper mapper) {
-		this.mapper = mapper;
-		this.flux = Flux.<Comment>create(
-			emitter -> this.webSocketCommentSink = emitter,
+	public OutboundChatService() {
+		this.flux = Flux.<String>create(
+			emitter -> this.chatMessageSink = emitter,
 			FluxSink.OverflowStrategy.IGNORE)
 			.publish()
 			.autoConnect();
 	}
 
-	@StreamListener(ChatServiceStreams.NEW_COMMENTS)
-	public void broadcast(Comment comment) {
-		if (webSocketCommentSink != null) {
-			log.info("Publishing " + comment.toString() +
+	@StreamListener(ChatServiceStreams.BROKER_TO_CLIENT)
+	public void listen(String message) {
+		if (chatMessageSink != null) {
+			log.info("Publishing " + message +
 				" to websocket...");
-			webSocketCommentSink.next(comment);
+			chatMessageSink.next(message);
 		}
 	}
 
 	@Override
 	public Mono<Void> handle(WebSocketSession session) {
 		return session.send(this.flux
-			.map(comment -> {
-				try {
-					return mapper.writeValueAsString(comment);
-				} catch (JsonProcessingException e) {
-					throw new RuntimeException(e);
-				}
-			})
-			.log("encode-as-json")
 			.map(session::textMessage)
-			.log("wrap-as-websocket-message"))
-			.log("publish-to-websocket");
+			.log("outbound-wrap-as-websocket-message"))
+			.log("outbound-publish-to-websocket");
+
 	}
 }
-// end::code[]

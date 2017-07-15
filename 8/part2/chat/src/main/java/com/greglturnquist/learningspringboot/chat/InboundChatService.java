@@ -17,11 +17,9 @@ package com.greglturnquist.learningspringboot.chat;
 
 import reactor.core.publisher.Mono;
 
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Controller;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
@@ -30,34 +28,37 @@ import org.springframework.web.reactive.socket.WebSocketSession;
  * @author Greg Turnquist
  */
 // tag::code[]
-@Controller
-public class ChatController implements WebSocketHandler {
+@Service
+@EnableBinding(ChatServiceStreams.class)
+public class InboundChatService implements WebSocketHandler {
 
-	private final SimpMessagingTemplate template;
+	private final ChatServiceStreams chatServiceStreams;
 
-	public ChatController(SimpMessagingTemplate template) {
-		this.template = template;
+	public InboundChatService(ChatServiceStreams chatServiceStreams) {
+		this.chatServiceStreams = chatServiceStreams;
 	}
 
-	@MessageMapping("/chatMessage.new")
-	@SendTo("/topic/chatMessage.new")
-	public String newChatMessage(String newChatMessage,
-								 SimpMessageHeaderAccessor
-									 headerAccessor) {
-		return headerAccessor.getSessionId()+ ": " + newChatMessage;
+	public Mono<?> broadcast(String message) {
+		return Mono.fromRunnable(() -> {
+			chatServiceStreams.clientToBroker().send(
+				MessageBuilder
+					.withPayload(message)
+					.build());
+		});
 	}
 
 	@Override
 	public Mono<Void> handle(WebSocketSession session) {
-		String sessionId = session.getHandshakeInfo()
-			.getHeaders().get("simpSessionId").get(0);
-
-		return session.send(
-			session
-				.receive()
-				.map(WebSocketMessage::getPayloadAsText)
-				.map(s -> sessionId + ": " + s)
-				.map(session::textMessage));
+		return session
+			.receive()
+			.log("inbound-incoming-chat-message")
+			.map(WebSocketMessage::getPayloadAsText)
+			.log("inbound-convert-to-text")
+			.map(s -> session.getId() + ": " + s)
+			.log("inbound-mark-with-session-id")
+			.flatMap(this::broadcast)
+			.log("inbound-broadcast-to-broker")
+			.then();
 	}
 }
 // end::code[]
