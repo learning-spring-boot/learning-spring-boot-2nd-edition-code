@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Learning Spring Boot: Spring-a-Gram</title>
+        <link rel="stylesheet" href="/main.css" />
+        <script src="webjars/requirejs/2.2.0/require.js" />
+    </head>
+    <body>
+
+        <h1>Learning Spring Boot - 2nd Edition</h1>
+
+        <!-- tag::username[] -->
+        <input id="username" type="text" />
+        <button id="connect">Connect</button>
+        <button id="disconnect" style="display: none">Disconnect</button>
+        <!-- end::username[] -->
+
+        <div>
+            <h3 th:text="${page.number + 1} + ' of ' + ${page.totalPages}" />
+            <h4 th:text="${page.size} + ' item(s) per page'" />
+            <table>
+                <thead>
+                <tr>
+                    <th>Id</th><th>Name</th><th>Image</th><th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="image : ${page.content}">
+                    <td th:text="${image.id}" />
+                    <td th:text="${image.name}" />
+                    <td><a th:href="@{'/images/' + ${image.name} + '/raw'}"><img th:src="@{'/images/' + ${image.name} + '/raw'}" class="thumbnail" /></a></td>
+                    <td>
+                        <form th:method="delete" th:action="@{'/images/' + ${image.name}}">
+                            <input type="submit" value="Delete" />
+                        </form>
+                    </td>
+                    <!-- tag::comments[] -->
+                    <td>
+                        <ul th:id="'comments-' + ${image.id}">
+                            <li th:each="comment : ${image.comments}" th:text="${comment.comment}"></li>
+                        </ul>
+                    </td>
+                    <td>
+                        <input th:id="'comment-' + ${image.id}" type="text" value="" />
+                        <button th:id="${image.id}" class="comment">Submit</button>
+                    </td>
+                    <!-- end::comments[] -->
+                </tr>
+                </tbody>
+            </table>
+
+            <ul>
+                <li th:if="${prev}"><a th:href="@{/(size=${prev.pageSize},page=${prev.pageNumber})}">Previous</a></li>
+                <li th:if="${next}"><a th:href="@{/(size=${next.pageSize},page=${next.pageNumber})}">Next</a></li>
+            </ul>
+
+            <form method="post" enctype="multipart/form-data" action="/images">
+                <p><input type="file" name="file" /></p>
+                <p><input type="submit" value="Upload" /></p>
+            </form>
+
+            <div id="chatBox" style="display: none">
+                Greetings!
+                <br/>
+                <textarea id="chatDisplay" rows="10" cols="80" disabled="true"></textarea>
+                <br/>
+                <input id="chatInput" type="text" style="width: 500px" value="" />
+                <br/>
+                <button id="chatButton">Send</button>
+                <br/>
+            </div>
+        </div>
+
+        <!-- tag::javascript[] -->
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            (function() {
+                window.require([
+                            'webjars/stompjs/2.3.3/lib/stomp.js',
+                            'webjars/sockjs-client/1.1.0/dist/sockjs.js'],
+                        function(stomp, SockJS) {
+
+                            // Register a handler for each button to make an AJAX call
+                            document.querySelectorAll('button.comment').forEach(function(button) {
+                                button.addEventListener('click', function() {
+                                    var comment = document.getElementById('comment-' + button.id);
+
+                                    var xhr = new XMLHttpRequest();
+                                    xhr.open('POST', /*[[@{'/comments'}]]*/'', true);
+
+                                    var formData = new FormData();
+                                    formData.append('comment', comment.value);
+                                    formData.append('imageId', button.id);
+
+                                    xhr.send(formData);
+
+                                    comment.value = '';
+                                });
+                            });
+
+                            var stompClient = null;
+
+                            // tag::connect[]
+                            document.getElementById('connect')
+                                    .addEventListener('click', function() {
+                                document.getElementById('connect').style.display = 'none';
+                                document.getElementById('disconnect').style.display = 'inline';
+
+                                var usernameInput = document.getElementById('username');
+
+                                document.getElementById('chatBox').style.display = 'inline';
+                                // end::connect[]
+
+                                // tag::login[]
+                                var socket =
+                                        SockJS('http://localhost:8200/learning-spring-boot?user='
+                                                + usernameInput.value);
+                                // end::login[]
+                                stompClient = Stomp.over(socket);
+                                stompClient.connect({}, function(frame) {
+
+                                    stompClient.subscribe('/topic/comments.new', function(message) {
+                                        var parsedMessage = JSON.parse(message.body);
+                                        var ul = document.getElementById('comments-' + parsedMessage.imageId);
+                                        var li = document.createElement('li');
+                                        li.appendChild(document.createTextNode(parsedMessage.comment));
+                                        ul.appendChild(li);
+                                    });
+
+                                    // Register handler for chat button
+                                    document.getElementById('chatButton').addEventListener('click', function() {
+                                        var chatInput = document.getElementById('chatInput');
+                                        stompClient.send('/app/chatMessage.new', {}, chatInput.value);
+                                        chatInput.value = '';
+                                        chatInput.focus();
+                                    });
+
+                                    // tag::chat[]
+                                    function postChatMessage(message) {
+                                        var chatDisplay = document.getElementById('chatDisplay');
+                                        chatDisplay.value = chatDisplay.value + message.body + '\n';
+                                    }
+
+                                    stompClient.subscribe('/topic/chatMessage.new', postChatMessage);
+                                    stompClient.subscribe(
+                                            '/user/queue/chatMessage.new', postChatMessage);
+                                    // end::chat[]
+
+                                    usernameInput.value = '';
+                                    document.getElementById('chatInput').focus();
+                                });
+
+                            });
+
+                            // tag::disconnect[]
+                            document.getElementById('disconnect')
+                                    .addEventListener('click', function() {
+                                document.getElementById('connect').style.display = 'inline';
+                                document.getElementById('disconnect').style.display = 'none';
+                                document.getElementById('chatBox').style.display = 'none';
+
+                                if (stompClient != null) {
+                                    stompClient.disconnect();
+                                }
+                            });
+                            // end::disconnect[]
+
+                        });
+
+            })();
+            /*]]>*/
+        </script>
+        <!-- end::javascript[] -->
+
+
+    </body>
+</html>

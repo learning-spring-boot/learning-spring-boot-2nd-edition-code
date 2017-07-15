@@ -1,0 +1,166 @@
+<!-- tag::template[] -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Learning Spring Boot: Spring-a-Gram</title>
+        <script src="webjars/requirejs/2.2.0/require.js" />
+        <link rel="stylesheet" href="/main.css" />
+    </head>
+    <body>
+        <h1>Learning Spring Boot - 2nd Edition</h1>
+
+        <div id="images"></div>
+
+        <div id="chatBox">
+            Greetings!
+            <br/>
+            <textarea id="chatDisplay"
+                      rows="10" cols="80"
+                      disabled="true" />
+            <br/>
+            <input id="chatInput" type="text"
+                   style="width: 500px" value="" />
+            <br/>
+            <button id="chatButton">Send</button>
+            <br/>
+        </div>
+    <!-- end::template[] -->
+
+        <!-- tag::images-javascript[] -->
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            (function() {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', /*[[@{'/imagesService'}]]*/'', true);
+                xhr.onload = function(e) {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            document.getElementById('images').innerHTML =
+                                    xhr.responseText;
+
+                            var csrfHeader = /*[[${_csrf.headerName}]]*/'';
+
+                            // Register a handler for each button
+                            document.querySelectorAll('button.comment')
+                                    .forEach(function(button) {
+                                button.addEventListener('click',
+                                        function() {
+                                    e.preventDefault();
+                                    var comment = document.getElementById(
+                                            'comment-' + button.id);
+
+                                    var xhr = new XMLHttpRequest();
+                                    xhr.open('POST',
+                                             /*[[@{'/comments/'}]]*/'',
+                                             true);
+                                    xhr.setRequestHeader('X-CSRF-TOKEN',
+                                                /*[[${_csrf.token}]]*/'');
+
+                                    var formData = new FormData();
+                                    formData.append('comment',
+                                                        comment.value);
+                                    formData.append('imageId', button.id);
+
+                                    xhr.send(formData);
+
+                                    comment.value = '';
+                                });
+                            });
+
+                            document.querySelectorAll('button.delete')
+                                    .forEach(function(button) {
+                                button.addEventListener('click', function() {
+                                    e.preventDefault();
+                                    var xhr = new XMLHttpRequest();
+                                    xhr.open('DELETE', button.id, true);
+                                    xhr.setRequestHeader('X-CSRF-TOKEN',
+                                            /*[[${_csrf.token}]]*/'');
+                                    xhr.withCredentials = true;
+                                    xhr.send(null);
+                                });
+                            });
+
+                            document.getElementById('upload')
+                                    .addEventListener('click', function() {
+                                e.preventDefault();
+                                var xhr = new XMLHttpRequest();
+                                xhr.open('POST',
+                                         /*[[@{'/images'}]]*/'',
+                                         true);
+                                xhr.setRequestHeader('X-CSRF-TOKEN',
+                                        /*[[${_csrf.token}]]*/'');
+
+                                var files = document
+                                        .getElementById('file').files;
+
+                                var formData  = new FormData();
+                                formData.append('file', files[0],
+                                        files[0].name);
+
+                                xhr.send(formData);
+                            })
+                        }
+                    }
+                }
+                xhr.send(null);
+            })();
+            /*]]>*/
+        </script>
+        <!-- end::images-javascript[] -->
+
+        <!-- tag::websocket-javascript[] -->
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            (function() {
+                window.require([
+                            'webjars/stompjs/2.3.3/lib/stomp.js',
+                            'webjars/sockjs-client/1.1.0/dist/sockjs.js'],
+                        function(stomp, SockJS) {
+
+                            // tag::csrf-websocket[]
+                            var csrfToken = /*[[${_csrf.token}]]*/'';
+                            var socket = SockJS('https://' + window.location.host + ':4443/learning-spring-boot');
+                            var stompClient = Stomp.over(socket);
+
+                            stompClient.connect({'X-CSRF-TOKEN': csrfToken}, function(frame) {
+                            // end::csrf-websocket[]
+
+                                stompClient.subscribe('/topic/comments.new', function(message) {
+                                    var parsedMessage = JSON.parse(message.body);
+                                    var ul = document.getElementById('comments-' + parsedMessage.imageId);
+                                    var li = document.createElement('li');
+                                    li.appendChild(document.createTextNode(parsedMessage.comment));
+                                    ul.appendChild(li);
+                                });
+
+                                // Register handler for chat button
+                                document.getElementById('chatButton').addEventListener('click', function() {
+                                    var chatInput = document.getElementById('chatInput');
+                                    stompClient.send('/app/chatMessage.new', {}, chatInput.value);
+                                    chatInput.value = '';
+                                    chatInput.focus();
+                                });
+
+                                // tag::chat[]
+                                function postChatMessage(message) {
+                                    var chatDisplay = document.getElementById('chatDisplay');
+                                    chatDisplay.value = chatDisplay.value + message.body + '\n';
+                                }
+
+                                stompClient.subscribe('/topic/chatMessage.new', postChatMessage);
+                                stompClient.subscribe(
+                                        '/user/queue/chatMessage.new', postChatMessage);
+                                // end::chat[]
+
+                                document.getElementById('chatInput').focus();
+                            });
+
+                        })
+            })();
+            /*]]>*/
+        </script>
+        <!-- end::websocket-javascript[] -->
+
+    </body>
+</html>
