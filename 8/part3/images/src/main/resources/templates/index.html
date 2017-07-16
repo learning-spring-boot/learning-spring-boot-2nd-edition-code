@@ -89,7 +89,6 @@
 				var newComments = null;
                 var outboundChatMessages = null;
                 var inboundChatMessages = null;
-                var inboundUserMessages = null;
 
 				// tag::connect[]
 				document.getElementById('connect')
@@ -131,18 +130,12 @@
                         }
 
                         // tag::chat[]
-                        function postChatMessage(event) {
-                            var chatDisplay = document.getElementById('chatDisplay');
-                            chatDisplay.value = chatDisplay.value + event.data + '\n';
-                        }
-
                         inboundChatMessages = new WebSocket('ws://localhost:8200/topic/chatMessage.new?user='
                             + usernameInput.value);
-                        inboundChatMessages.onmessage = postChatMessage;
-    
-//                        inboundUserMessages = new WebSocket('ws://localhost:8200/user/queue/chatMessage.new?user='
-//                                + usernameInput.value);
-//                        inboundUserMessages.onmessage = postChatMessage;
+                        inboundChatMessages.onmessage = function(event) {
+							var chatDisplay = document.getElementById('chatDisplay');
+							chatDisplay.value = chatDisplay.value + event.data + '\n';
+						};
                         // end::chat[]
 
 						usernameInput.value = '';
@@ -164,9 +157,6 @@
                         }
 						if (inboundChatMessages != null) {
 							inboundChatMessages.close();
-                        }
-						if (inboundUserMessages != null) {
-							inboundUserMessages.close();
                         }
 					});
 				// end::disconnect[]
