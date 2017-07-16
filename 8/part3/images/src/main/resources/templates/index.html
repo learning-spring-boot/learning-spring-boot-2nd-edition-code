@@ -4,7 +4,6 @@
         <meta charset="UTF-8" />
         <title>Learning Spring Boot: Spring-a-Gram</title>
         <link rel="stylesheet" href="/main.css" />
-        <script src="webjars/requirejs/2.2.0/require.js" />
     </head>
     <body>
 
@@ -17,8 +16,6 @@
         <!-- end::username[] -->
 
         <div>
-            <h3 th:text="${page.number + 1} + ' of ' + ${page.totalPages}" />
-            <h4 th:text="${page.size} + ' item(s) per page'" />
             <table>
                 <thead>
                 <tr>
@@ -26,7 +23,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="image : ${page.content}">
+                <tr th:each="image : ${images}">
                     <td th:text="${image.id}" />
                     <td th:text="${image.name}" />
                     <td><a th:href="@{'/images/' + ${image.name} + '/raw'}"><img th:src="@{'/images/' + ${image.name} + '/raw'}" class="thumbnail" /></a></td>
@@ -50,11 +47,6 @@
                 </tbody>
             </table>
 
-            <ul>
-                <li th:if="${prev}"><a th:href="@{/(size=${prev.pageSize},page=${prev.pageNumber})}">Previous</a></li>
-                <li th:if="${next}"><a th:href="@{/(size=${next.pageSize},page=${next.pageNumber})}">Next</a></li>
-            </ul>
-
             <form method="post" enctype="multipart/form-data" action="/images">
                 <p><input type="file" name="file" /></p>
                 <p><input type="submit" value="Upload" /></p>
@@ -76,98 +68,108 @@
         <script th:inline="javascript">
             /*<![CDATA[*/
             (function() {
-                window.require([
-                            'webjars/stompjs/2.3.3/lib/stomp.js',
-                            'webjars/sockjs-client/1.1.0/dist/sockjs.js'],
-                        function(stomp, SockJS) {
+				// Register a handler for each button to make an AJAX call
+				document.querySelectorAll('button.comment').forEach(function(button) {
+					button.addEventListener('click', function() {
+						var comment = document.getElementById('comment-' + button.id);
 
-                            // Register a handler for each button to make an AJAX call
-                            document.querySelectorAll('button.comment').forEach(function(button) {
-                                button.addEventListener('click', function() {
-                                    var comment = document.getElementById('comment-' + button.id);
+						var xhr = new XMLHttpRequest();
+						xhr.open('POST', /*[[@{'/comments'}]]*/'', true);
 
-                                    var xhr = new XMLHttpRequest();
-                                    xhr.open('POST', /*[[@{'/comments'}]]*/'', true);
+						var formData = new FormData();
+						formData.append('comment', comment.value);
+						formData.append('imageId', button.id);
 
-                                    var formData = new FormData();
-                                    formData.append('comment', comment.value);
-                                    formData.append('imageId', button.id);
+						xhr.send(formData);
 
-                                    xhr.send(formData);
+						comment.value = '';
+					});
+				});
 
-                                    comment.value = '';
+				var newComments = null;
+                var outboundChatMessages = null;
+                var inboundChatMessages = null;
+                var inboundUserMessages = null;
+
+				// tag::connect[]
+				document.getElementById('connect')
+					.addEventListener('click', function() {
+						document.getElementById('connect').style.display = 'none';
+						document.getElementById('disconnect').style.display = 'inline';
+
+						var usernameInput = document.getElementById('username');
+
+						document.getElementById('chatBox').style.display = 'inline';
+						// end::connect[]
+
+                        // Listen for new comments
+                        newComments = new WebSocket('ws://localhost:8200/topic/comments.new?user='
+                            + usernameInput.value);
+                        newComments.onmessage = function(event) {
+                            console.log('Received ' + event.data + '!');
+                            var parsedMessage = JSON.parse(event.data);
+                            var ul = document.getElementById(
+                                'comments-' + parsedMessage.imageId);
+                            var li = document.createElement('li');
+                            li.appendChild(
+                                document.createTextNode(parsedMessage.comment));
+                            ul.appendChild(li);
+                        }
+
+                        outboundChatMessages = new WebSocket('ws://localhost:8200/app/chatMessage.new?user='
+                            + usernameInput.value);
+                        // Post new chat messages
+                        outboundChatMessages.onopen = function(event) {
+                            document.getElementById('chatButton')
+                                .addEventListener('click', function () {
+                                    var chatInput = document.getElementById('chatInput');
+                                    console.log('Publishing "' + chatInput.value + '"');
+                                    outboundChatMessages.send(chatInput.value);
+                                    chatInput.value = '';
+                                    chatInput.focus();
                                 });
-                            });
+                        }
 
-                            var stompClient = null;
+                        // tag::chat[]
+                        function postChatMessage(event) {
+                            var chatDisplay = document.getElementById('chatDisplay');
+                            chatDisplay.value = chatDisplay.value + event.data + '\n';
+                        }
 
-                            // tag::connect[]
-                            document.getElementById('connect')
-                                    .addEventListener('click', function() {
-                                document.getElementById('connect').style.display = 'none';
-                                document.getElementById('disconnect').style.display = 'inline';
+                        inboundChatMessages = new WebSocket('ws://localhost:8200/topic/chatMessage.new?user='
+                            + usernameInput.value);
+                        inboundChatMessages.onmessage = postChatMessage;
+    
+//                        inboundUserMessages = new WebSocket('ws://localhost:8200/user/queue/chatMessage.new?user='
+//                                + usernameInput.value);
+//                        inboundUserMessages.onmessage = postChatMessage;
+                        // end::chat[]
 
-                                var usernameInput = document.getElementById('username');
+						usernameInput.value = '';
+						document.getElementById('chatInput').focus();
+                });
 
-                                document.getElementById('chatBox').style.display = 'inline';
-                                // end::connect[]
+				// tag::disconnect[]
+				document.getElementById('disconnect')
+					.addEventListener('click', function() {
+						document.getElementById('connect').style.display = 'inline';
+						document.getElementById('disconnect').style.display = 'none';
+						document.getElementById('chatBox').style.display = 'none';
 
-                                // tag::login[]
-                                var socket =
-                                        SockJS('http://localhost:8200/learning-spring-boot?user='
-                                                + usernameInput.value);
-                                // end::login[]
-                                stompClient = Stomp.over(socket);
-                                stompClient.connect({}, function(frame) {
-
-                                    stompClient.subscribe('/topic/comments.new', function(message) {
-                                        var parsedMessage = JSON.parse(message.body);
-                                        var ul = document.getElementById('comments-' + parsedMessage.imageId);
-                                        var li = document.createElement('li');
-                                        li.appendChild(document.createTextNode(parsedMessage.comment));
-                                        ul.appendChild(li);
-                                    });
-
-                                    // Register handler for chat button
-                                    document.getElementById('chatButton').addEventListener('click', function() {
-                                        var chatInput = document.getElementById('chatInput');
-                                        stompClient.send('/app/chatMessage.new', {}, chatInput.value);
-                                        chatInput.value = '';
-                                        chatInput.focus();
-                                    });
-
-                                    // tag::chat[]
-                                    function postChatMessage(message) {
-                                        var chatDisplay = document.getElementById('chatDisplay');
-                                        chatDisplay.value = chatDisplay.value + message.body + '\n';
-                                    }
-
-                                    stompClient.subscribe('/topic/chatMessage.new', postChatMessage);
-                                    stompClient.subscribe(
-                                            '/user/queue/chatMessage.new', postChatMessage);
-                                    // end::chat[]
-
-                                    usernameInput.value = '';
-                                    document.getElementById('chatInput').focus();
-                                });
-
-                            });
-
-                            // tag::disconnect[]
-                            document.getElementById('disconnect')
-                                    .addEventListener('click', function() {
-                                document.getElementById('connect').style.display = 'inline';
-                                document.getElementById('disconnect').style.display = 'none';
-                                document.getElementById('chatBox').style.display = 'none';
-
-                                if (stompClient != null) {
-                                    stompClient.disconnect();
-                                }
-                            });
-                            // end::disconnect[]
-
-                        });
-
+						if (newComments != null) {
+							newComments.close();
+						}
+						if (outboundChatMessages != null) {
+							outboundChatMessages.close();
+                        }
+						if (inboundChatMessages != null) {
+							inboundChatMessages.close();
+                        }
+						if (inboundUserMessages != null) {
+							inboundUserMessages.close();
+                        }
+					});
+				// end::disconnect[]
             })();
             /*]]>*/
         </script>

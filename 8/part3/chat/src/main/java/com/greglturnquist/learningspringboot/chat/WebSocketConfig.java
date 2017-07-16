@@ -15,51 +15,51 @@
  */
 package com.greglturnquist.learningspringboot.chat;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.reactive.HandlerMapping;
+import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
+import org.springframework.web.reactive.socket.WebSocketHandler;
+import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter;
 
 /**
  * @author Greg Turnquist
  */
 // tag::websocket-1[]
 @Configuration
-//@EnableWebSocketMessageBroker
-public class WebSocketConfig /*extends AbstractWebSocketMessageBrokerConfigurer*/ {
+public class WebSocketConfig {
 // end::websocket-1[]
 
-	// tag::websocket-2[]
-//	@Override
-//	public void registerStompEndpoints(StompEndpointRegistry registry) {
-//		registry.addEndpoint("/learning-spring-boot")
-//			.setHandshakeHandler(new UserParsingHandshakeHandler())
-//			.setAllowedOrigins("http://localhost:8080")
-//			.withSockJS();
-//	}
-	// end::websocket-2[]
+	@Bean
+	HandlerMapping webSocketMapping(CommentService commentService,
+									InboundChatService inboundChatService,
+									OutboundChatService outboundChatService) {
+		Map<String, WebSocketHandler> urlMap = new HashMap<>();
+		urlMap.put("/topic/comments.new", commentService);
+		urlMap.put("/app/chatMessage.new", inboundChatService);
+		urlMap.put("/topic/chatMessage.new", outboundChatService);
 
-	// tag::websocket-3[]
-//	@Override
-//	public void configureMessageBroker(MessageBrokerRegistry registry) {
-//		registry.setApplicationDestinationPrefixes("/app");
-//		registry.enableSimpleBroker("/topic", "/queue");
-//	}
-	// end::websocket-3[]
+		Map<String, CorsConfiguration> corsConfigurationMap = new HashMap<>();
+		CorsConfiguration corsConfiguration = new CorsConfiguration();
+		corsConfiguration.addAllowedOrigin("http://localhost:8080");
+		corsConfigurationMap.put("/topic/comments.new", corsConfiguration);
+		corsConfigurationMap.put("/app/chatMessage.new", corsConfiguration);
+		corsConfigurationMap.put("/topic/chatMessage.new", corsConfiguration);
 
-	// tag::websocket-4[]
-//	static class UserParsingHandshakeHandler
-//		extends DefaultHandshakeHandler {
-//
-//		@Override
-//		protected Principal determineUser(ServerHttpRequest request,
-//										  WebSocketHandler wsHandler,
-//										  Map<String, Object> attributes) {
-//			ServletServerHttpRequest servletRequest =
-//				(ServletServerHttpRequest) request;
-//			HttpServletRequest httpServletRequest =
-//				servletRequest.getServletRequest();
-//			return new BasicUserPrincipal(
-//				httpServletRequest.getParameter("user"));
-//		}
-//	}
-	// end::websocket-4[]
+		SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
+		mapping.setOrder(10);
+		mapping.setUrlMap(urlMap);
+		mapping.setCorsConfigurations(corsConfigurationMap);
 
+		return mapping;
+	}
+
+	@Bean
+	WebSocketHandlerAdapter handlerAdapter() {
+		return new WebSocketHandlerAdapter();
+	}
 }
