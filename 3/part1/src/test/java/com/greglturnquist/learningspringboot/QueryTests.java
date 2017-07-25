@@ -57,26 +57,28 @@ public class QueryTests {
 	// end::inject-template[]
 
 	@Autowired
-	MongoOperations blockingOperations;
+	MongoOperations mongoOperations;
 
 	@Before
 	public void setUp() {
 		// tag::setup[]
-		blockingOperations.dropCollection(Employee.class);
+		mongoOperations.dropCollection(Employee.class);
 
 		Employee e1 = new Employee();
 		e1.setId(UUID.randomUUID().toString());
 		e1.setFirstName("Bilbo");
 		e1.setLastName("Baggins");
 		e1.setRole("burglar");
-		blockingOperations.insert(e1);
+
+		mongoOperations.insert(e1);
 
 		Employee e2 = new Employee();
 		e2.setId(UUID.randomUUID().toString());
 		e2.setFirstName("Frodo");
 		e2.setLastName("Baggins");
 		e2.setRole("ring bearer");
-		blockingOperations.insert(e2);
+		
+		mongoOperations.insert(e2);
 		// end::setup[]
 	}
 

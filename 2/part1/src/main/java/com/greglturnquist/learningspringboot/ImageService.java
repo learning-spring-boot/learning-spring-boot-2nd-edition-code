@@ -15,20 +15,23 @@
  */
 package com.greglturnquist.learningspringboot;
 
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.stereotype.Service;
-import org.springframework.util.FileCopyUtils;
-import org.springframework.util.FileSystemUtils;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.FileSystemUtils;
 
 /**
  * @author Greg Turnquist
@@ -45,21 +48,27 @@ public class ImageService {
 	}
 
 
-	public Resource findOneImage(String filename) {
-		return resourceLoader.getResource("file:" + UPLOAD_ROOT + "/" + filename);
+	public Mono<Resource> findOneImage(String filename) {
+		return Mono.fromSupplier(() ->
+			resourceLoader.getResource(
+				"file:" + UPLOAD_ROOT + "/" + filename));
 	}
 
-	public void createImage(MultipartFile file) throws IOException {
-
-		if (!file.isEmpty()) {
-			Files.copy(file.getInputStream(),
-				Paths.get(UPLOAD_ROOT, file.getOriginalFilename()));
-		}
+	public Mono<Void> createImage(Flux<FilePart> files) {
+		return files
+			.flatMap(file -> file.transferTo(
+				Paths.get(UPLOAD_ROOT, file.filename()).toFile()))
+			.then();
 	}
 
-	public void deleteImage(String filename) throws IOException {
-
-		Files.deleteIfExists(Paths.get(UPLOAD_ROOT, filename));
+	public Mono<Void> deleteImage(String filename) {
+		return Mono.fromRunnable(() -> {
+			try {
+				Files.deleteIfExists(Paths.get(UPLOAD_ROOT, filename));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		});
 	}
 
 	/**
