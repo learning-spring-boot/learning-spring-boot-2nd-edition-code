@@ -48,11 +48,11 @@ public class EmbeddedImageRepositoryTests {
 
 	// tag::2[]
 	/**
-	 * To avoid {@code block()} calls, use blocking {@link MongoOperations} during setup.
+	 * To avoid {@code block()} calls, use blocking
+	 * {@link MongoOperations} during setup.
 	 */
 	@Before
 	public void setUp() {
-
 		operations.dropCollection(Image.class);
 
 		operations.insert(new Image("1",
@@ -103,12 +103,4 @@ public class EmbeddedImageRepositoryTests {
 			});
 	}
 	// end::4[]
-
-	// tag::5[]
-	@Test
-	public void findAllShouldWork2() {
-		// TODO: Remove
-	}
-	// end::5[]
-
 }

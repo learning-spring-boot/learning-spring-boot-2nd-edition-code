@@ -49,7 +49,8 @@ public class LiveImageRepositoryTests {
 	// end::1[]
 
 	/**
-	 * To avoid {@code block()} calls, use blocking {@link MongoOperations} during setup.
+	 * To avoid {@code block()} calls, use blocking
+	 * {@link MongoOperations} during setup.
 	 */
 	@Before
 	public void setUp() {

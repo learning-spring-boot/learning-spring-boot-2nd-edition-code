@@ -20,7 +20,9 @@ import static org.openqa.selenium.chrome.ChromeDriverService.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -57,11 +59,15 @@ public class EndToEndTests {
 
 	// tag::3[]
 	@BeforeClass
-	public static void setUp() throws MalformedURLException {
+	public static void setUp() throws IOException {
 		System.setProperty("webdriver.chrome.driver",
 			"ext/chromedriver");
 		service = createDefaultService();
 		driver = new ChromeDriver(service);
+		Path testResults = Paths.get("build", "test-results");
+		if (!Files.exists(testResults)) {
+			Files.createDirectory(testResults);
+		}
 	}
 
 	@AfterClass

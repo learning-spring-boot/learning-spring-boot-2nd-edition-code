@@ -57,6 +57,9 @@ public class ImageServiceTests {
 	@MockBean
 	InitDatabase initDatabase;
 
+	@MockBean(name = "setUp")
+	Object ignoreImageServiceCommandLineRunner;
+
 	@Before
 	public void setUp() throws IOException {
 		FileSystemUtils.deleteRecursively(new File(ImageService.UPLOAD_ROOT));
