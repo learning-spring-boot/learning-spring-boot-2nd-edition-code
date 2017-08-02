@@ -39,16 +39,13 @@ repositories {
 }
 
 // tag::deps[]
-ext['thymeleaf-spring5.version'] = '3.0.7-SNAPSHOT'
-
 dependencies {
-	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	compile('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
 	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
-	compile('org.springframework.boot:spring-boot-starter-web')
-	compile('org.springframework:spring-messaging')
+	compile('org.springframework.boot:spring-boot-starter-webflux')
 
 	compile('org.projectlombok:lombok')
-	runtime('com.h2database:h2')
+	compile('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 // end::deps[]

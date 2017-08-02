@@ -1,5 +1,7 @@
 package com.greglturnquist.learningspringboot;
 
+import reactor.core.publisher.Flux;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,7 +15,7 @@ public class ChapterController {
 	}
 
 	@GetMapping("/chapters")
-	public Iterable<Chapter> listing() {
+	public Flux<Chapter> listing() {
 		return repository.findAll();
 	}
 }

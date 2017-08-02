@@ -1,8 +1,8 @@
 package com.greglturnquist.learningspringboot;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 
 public interface ChapterRepository
-	extends CrudRepository<Chapter, Long> {
+	extends ReactiveCrudRepository<Chapter, String> {
 
 }

@@ -1,5 +1,7 @@
 package com.greglturnquist.learningspringboot;
 
+import reactor.core.publisher.Flux;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,12 +12,12 @@ public class LoadDatabase {
 	@Bean
 	CommandLineRunner init(ChapterRepository repository) {
 		return args -> {
-			repository.save(
-				new Chapter("Quick start with Java"));
-			repository.save(
-				new Chapter("Reactive Web with Spring Boot"));
-			repository.save(
-				new Chapter("...and more!"));
+			Flux.just(
+				new Chapter("Quick Start with Java"),
+				new Chapter("Reactive Web with Spring Boot"),
+				new Chapter("...and more!"))
+			.flatMap(repository::save)
+			.subscribe(System.out::println);
 		};
 	}
 

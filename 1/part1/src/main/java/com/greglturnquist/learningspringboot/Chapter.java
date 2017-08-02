@@ -1,23 +1,17 @@
 package com.greglturnquist.learningspringboot;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
 import lombok.Data;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 @Data
-@Entity
+@Document
 public class Chapter {
 
-	@Id @GeneratedValue
-	private Long id;
-
+	@Id
+	private String id;
 	private String name;
-
-	private Chapter() {
-		// No one but JPA uses this.
-	}
 
 	public Chapter(String name) {
 		this.name = name;
