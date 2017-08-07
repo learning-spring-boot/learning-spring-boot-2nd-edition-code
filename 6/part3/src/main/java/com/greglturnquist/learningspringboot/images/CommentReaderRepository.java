@@ -16,13 +16,13 @@
 // tag::code[]
 package com.greglturnquist.learningspringboot.images;
 
-import org.springframework.data.repository.Repository;
+import reactor.core.publisher.Flux;
 
-import java.util.List;
+import org.springframework.data.repository.Repository;
 
 public interface CommentReaderRepository
 	extends Repository<Comment, String> {
 
-	List<Comment> findByImageId(String imageId);
+	Flux<Comment> findByImageId(String imageId);
 }
 // end::code[]

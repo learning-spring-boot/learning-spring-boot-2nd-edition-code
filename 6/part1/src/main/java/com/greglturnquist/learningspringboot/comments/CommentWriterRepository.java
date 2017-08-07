@@ -26,11 +26,9 @@ import org.springframework.data.repository.Repository;
 public interface CommentWriterRepository
 	extends Repository<Comment, String> {
 
-	Mono<Comment> save(Mono<Comment> newComment);
+	Mono<Comment> save(Comment newComment);
 
 	// Needed to support save()
 	Mono<Comment> findById(String id);
-
-	Mono<Void> deleteAll();
 }
 // end::code[]

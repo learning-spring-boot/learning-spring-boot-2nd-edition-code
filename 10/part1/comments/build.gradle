@@ -55,7 +55,7 @@ dependencies {
 	compile('org.springframework.cloud:spring-cloud-starter-config')
 	compile('org.projectlombok:lombok')
 
-	compile('org.springframework.boot:spring-boot-starter-security')
+	compile('org.springframework.security:spring-security-webflux')
 	compile('org.springframework.session:spring-session-data-mongodb:2.0.0.BUILD-SNAPSHOT')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')

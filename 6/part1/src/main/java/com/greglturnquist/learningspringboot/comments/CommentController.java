@@ -35,13 +35,15 @@ public class CommentController {
 	}
 
 	@PostMapping("/comments")
-	public Mono<String> addComment(Comment newComment) {
-		return Mono.fromRunnable(() -> rabbitTemplate
-			.convertAndSend(
-				"learning-spring-boot",
-				"comments.new", newComment)
-		)
-		.then(Mono.just("redirect:/"));
+	public Mono<String> addComment(Mono<Comment> newComment) {
+		return newComment.flatMap(comment ->
+				Mono.fromRunnable(() -> rabbitTemplate
+					.convertAndSend(
+						"learning-spring-boot",
+						"comments.new",
+						comment)))
+			.log("commentService-publish")
+			.then(Mono.just("redirect:/"));
 	}
 
 }

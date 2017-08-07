@@ -50,8 +50,6 @@ configurations {
 	all*.exclude group: 'org.springframework', module: 'spring-webmvc'
 }
 
-ext['thymeleaf-spring5.version'] = '3.0.7-SNAPSHOT'
-
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')
 	compile('org.synchronoss.cloud:nio-multipart-parser:1.1.0')
@@ -67,7 +65,7 @@ dependencies {
 	compile('org.projectlombok:lombok')
 
 	// tag::spring-session[]
-	compile('org.springframework.boot:spring-boot-starter-security')
+	compile('org.springframework.security:spring-security-webflux')
 	compile('org.springframework.session:spring-session-data-mongodb:2.0.0.BUILD-SNAPSHOT')
 	// end::spring-session[]
 

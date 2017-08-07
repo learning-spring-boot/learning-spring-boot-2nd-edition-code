@@ -16,9 +16,9 @@
 // tag::code[]
 package com.greglturnquist.learningspringboot.images;
 
-import org.springframework.data.annotation.Id;
-
 import lombok.Data;
+
+import org.springframework.data.annotation.Id;
 
 @Data
 public class Comment {

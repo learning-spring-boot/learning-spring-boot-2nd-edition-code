@@ -59,7 +59,8 @@ public class HomeController {
 	}
 	// end::index[]
 
-	@GetMapping(BASE_PATH + "/" + FILENAME + "/raw")
+	@GetMapping(value = BASE_PATH + "/" + FILENAME + "/raw",
+		produces = MediaType.IMAGE_JPEG_VALUE)
 	@ResponseBody
 	public Mono<ResponseEntity<?>> oneRawImage(
 		@PathVariable String filename) {
@@ -69,7 +70,6 @@ public class HomeController {
 				try {
 					return ResponseEntity.ok()
 						.contentLength(resource.contentLength())
-						.contentType(MediaType.IMAGE_JPEG)
 						.body(new InputStreamResource(
 							resource.getInputStream()));
 				} catch (IOException e) {

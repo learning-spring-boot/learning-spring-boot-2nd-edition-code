@@ -69,5 +69,4 @@ public class HomeController {
 		);
 		return Mono.just("index");
 	}
-
 }

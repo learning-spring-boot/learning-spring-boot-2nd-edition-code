@@ -17,6 +17,8 @@ package com.greglturnquist.learningspringboot;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import reactor.core.publisher.Mono;
+
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -52,7 +54,7 @@ public class CommentSimulator {
 			comment.setImageId(image.getId());
 			comment.setComment(
 				"Comment #" + counter.getAndIncrement());
-			return controller.addComment(comment);
+			return controller.addComment(Mono.just(comment));
 		})
 		.subscribe();
 	}

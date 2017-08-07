@@ -15,8 +15,6 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
-import reactor.core.publisher.Mono;
-
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
@@ -24,6 +22,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Service;
 
 /**
@@ -48,7 +47,8 @@ public class CommentService {
 	))
 	public void save(Comment newComment) {
 		repository
-			.save(Mono.just(newComment))
+			.save(newComment)
+			.log("commentService-save")
 			.subscribe();
 	}
 	// end::comment-service-2[]
@@ -62,9 +62,9 @@ public class CommentService {
 
 	// tag::comment-service-4[]
 	@Bean
-	CommandLineRunner setUp(CommentWriterRepository repository) {
+	CommandLineRunner setUp(MongoOperations operations) {
 		return args -> {
-			repository.deleteAll().subscribe();
+			operations.dropCollection(Comment.class);
 		};
 	}
 	// end::comment-service-4[]

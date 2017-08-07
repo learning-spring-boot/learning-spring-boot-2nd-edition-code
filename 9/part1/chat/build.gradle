@@ -45,8 +45,6 @@ configurations {
 	all*.exclude group: 'org.springframework', module: 'spring-webmvc'
 }
 
-ext['thymeleaf-spring5.version'] = '3.0.7-SNAPSHOT'
-
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')
 	compile('org.springframework.boot:spring-boot-starter-actuator')
@@ -58,7 +56,6 @@ dependencies {
 	compile('org.springframework.cloud:spring-cloud-starter-eureka')
 	compile('org.springframework.cloud:spring-cloud-starter-hystrix')
 	compile('org.springframework.cloud:spring-cloud-starter-config')
-	compile('org.springframework:spring-messaging')
 
 	compile('org.webjars:requirejs:2.2.0')
 	compile('org.webjars.npm:stompjs:2.3.3') {
@@ -66,16 +63,12 @@ dependencies {
 	}
 	compile('org.webjars.bower:sockjs-client:1.1.0')
 
-	compile('org.springframework.boot:spring-boot-starter-security')
-
-	//tag::websocket[]
-	compile('org.springframework.security:spring-security-messaging')
-	//end::websocket[]
+	compile('org.springframework.security:spring-security-webflux')
 
 	compile('org.springframework.session:spring-session-data-mongodb:2.0.0.BUILD-SNAPSHOT')
 
 	// tag::zuul[]
-	compile('org.springframework.cloud:spring-cloud-starter-zuul')
+	compile('org.springframework.cloud:spring-cloud-starter-gateway')
 	// end::zuul[]
 
 	// tag::thymeleaf-security[]

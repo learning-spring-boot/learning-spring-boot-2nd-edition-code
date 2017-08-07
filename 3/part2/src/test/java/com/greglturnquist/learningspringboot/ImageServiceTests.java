@@ -144,7 +144,6 @@ public class ImageServiceTests {
 		public ImageService imageService(ResourceLoader resourceLoader, ImageRepository imageRepository) {
 			return new ImageService(resourceLoader, imageRepository);
 		}
-
 	}
 
 }

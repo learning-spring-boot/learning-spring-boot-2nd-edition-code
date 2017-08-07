@@ -75,8 +75,21 @@ public class ImageService {
 						UUID.randomUUID().toString(),
 						file.filename()));
 
-				Mono<Void> copyFile = file
-					.transferTo(Paths.get(UPLOAD_ROOT, file.filename()).toFile());
+				Mono<Void> copyFile = Mono.just(
+					Paths.get(UPLOAD_ROOT, file.filename())
+						.toFile())
+					.log("createImage-picktarget")
+					.map(destFile -> {
+						try {
+							destFile.createNewFile();
+							return destFile;
+						} catch (IOException e) {
+							throw new RuntimeException(e);
+						}
+					})
+					.log("createImage-newfile")
+					.flatMap(file::transferTo)
+					.log("createImage-copy");
 
 				return Mono.when(saveDatabaseImage, copyFile);
 			})
@@ -92,7 +105,8 @@ public class ImageService {
 
 		Mono<Void> deleteFile = Mono.fromRunnable(() -> {
 			try {
-				Files.deleteIfExists(Paths.get(UPLOAD_ROOT, filename));
+				Files.deleteIfExists(
+					Paths.get(UPLOAD_ROOT, filename));
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}

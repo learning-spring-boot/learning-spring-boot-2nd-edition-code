@@ -40,17 +40,21 @@ public class CommentController {
 	}
 
 	@PostMapping("/comments")
-	public Mono<String> addComment(Comment newComment) {
-		return Mono.fromRunnable(() -> rabbitTemplate
-				.convertAndSend(
-					"learning-spring-boot",
-					"comments.new", newComment)
-			)
-			.map(aVoid -> {
+	public Mono<String> addComment(Mono<Comment> newComment) {
+		return newComment.flatMap(comment ->
+			Mono.fromRunnable(() ->
+				rabbitTemplate
+					.convertAndSend(
+						"learning-spring-boot",
+						"comments.new",
+						comment))
+			.then(Mono.just(comment)))
+			.log("commentService-publish")
+			.flatMap(comment -> {
 				counterService.increment("comments.total.produced");
 				counterService.increment(
-					"comments." + newComment.getImageId() + ".produced");
-				return "redirect:/";
+					"comments." + comment.getImageId() + ".produced");
+				return Mono.just("redirect:/");
 			});
 	}
 }

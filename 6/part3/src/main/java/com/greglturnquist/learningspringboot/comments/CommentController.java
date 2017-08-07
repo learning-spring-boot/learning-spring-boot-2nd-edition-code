@@ -15,11 +15,17 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.cloud.stream.messaging.Source;
+import org.springframework.cloud.stream.reactive.FluxSender;
+import org.springframework.cloud.stream.reactive.StreamEmitter;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,29 +38,36 @@ import org.springframework.web.bind.annotation.PostMapping;
 @EnableBinding(Source.class)
 public class CommentController {
 
-	private final Source source;
-
 	private final CounterService counterService;
+	private FluxSink<Message<Comment>> commentSink;
+	private Flux<Message<Comment>> flux;
 
-	public CommentController(Source source,
-							 CounterService counterService) {
-		this.source = source;
+	public CommentController(CounterService counterService) {
 		this.counterService = counterService;
+		this.flux = Flux.<Message<Comment>>create(
+			emitter -> this.commentSink = emitter,
+			FluxSink.OverflowStrategy.IGNORE)
+			.publish()
+			.autoConnect();
+
 	}
 
 	@PostMapping("/comments")
 	public Mono<String> addComment(Comment newComment) {
-		return Mono.fromRunnable(() -> source.output().send(
-			MessageBuilder
+		if (commentSink != null) {
+			return Mono.fromRunnable(() -> commentSink.next(MessageBuilder
 				.withPayload(newComment)
-				.build())
-			)
-			.map(aVoid -> {
-				counterService.increment("comments.total.produced");
-				counterService.increment(
-					"comments." + newComment.getImageId() + ".produced");
-				return "redirect:/";
-			});
+				.build()))
+				.then(Mono.just("redirect:/"));
+		} else {
+			return Mono.just("redirect:/");
+		}
+	}
+
+	@StreamEmitter
+	@Output(Source.OUTPUT)
+	public void emit(FluxSender output) {
+		output.send(this.flux);
 	}
 
 }

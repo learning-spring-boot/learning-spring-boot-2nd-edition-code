@@ -1,3 +1,4 @@
+
 spring:
   http:
     multipart:
@@ -9,3 +10,11 @@ spring:
           group: learning-spring-boot
         output:
           group: learning-spring-boot
+logging:
+  level:
+    org:
+      rabbitmq: TRACE
+      springframework:
+        amqp: TRACE
+        cloud: TRACE
+        integration: TRACE

@@ -16,6 +16,7 @@
 package com.greglturnquist.learningspringboot;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Component;
 
@@ -23,29 +24,24 @@ import org.springframework.stereotype.Component;
  * @author Greg Turnquist
  */
 @Component
-public class InitDatabase implements CommandLineRunner {
+public class InitDatabase {
+	@Bean
+	CommandLineRunner init(MongoOperations operations) {
+		return args -> {
+			// tag::log[]
+			operations.dropCollection(Image.class);
 
-	private final MongoOperations operations;
+			operations.insert(new Image("1",
+				"learning-spring-boot-cover.jpg"));
+			operations.insert(new Image("2",
+				"learning-spring-boot-2nd-edition-cover.jpg"));
+			operations.insert(new Image("3",
+				"bazinga.png"));
 
-	public InitDatabase(MongoOperations operations) {
-		this.operations = operations;
-	}
-
-	@Override
-	public void run(String... args) throws Exception {
-		// tag::log[]
-		operations.dropCollection(Image.class);
-
-		operations.insert(new Image("1",
-			"learning-spring-boot-cover.jpg"));
-		operations.insert(new Image("2",
-			"learning-spring-boot-2nd-edition-cover.jpg"));
-		operations.insert(new Image("3",
-			"bazinga.png"));
-
-		operations.findAll(Image.class).forEach(image -> {
-			System.out.println(image.toString());
-		});
-		// end::log[]
+			operations.findAll(Image.class).forEach(image -> {
+				System.out.println(image.toString());
+			});
+			// end::log[]
+		};
 	}
 }

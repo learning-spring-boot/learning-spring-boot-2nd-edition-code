@@ -34,8 +34,6 @@ repositories {
 }
 
 // tag::deps[]
-ext['thymeleaf-spring5.version'] = '3.0.7-SNAPSHOT'
-
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')
 	compile("org.springframework.boot:spring-boot-starter-thymeleaf")

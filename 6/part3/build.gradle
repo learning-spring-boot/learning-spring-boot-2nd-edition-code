@@ -39,7 +39,13 @@ repositories {
 	maven { url "https://dl.bintray.com/rabbitmq/maven-milestones/" }
 }
 
-ext['thymeleaf-spring5.version'] = '3.0.7-SNAPSHOT'
+// tag::exclude-tomcat[]
+configurations {
+	all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+//	all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-validation'
+	all*.exclude group: 'org.springframework', module: 'spring-webmvc'
+}
+// end::exclude-tomcat[]
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')

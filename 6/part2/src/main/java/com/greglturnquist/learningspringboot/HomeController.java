@@ -16,6 +16,7 @@
 package com.greglturnquist.learningspringboot;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.greglturnquist.learningspringboot.images.CommentReaderRepository;
 import com.greglturnquist.learningspringboot.images.ImageService;
 
 /**
@@ -45,23 +47,37 @@ public class HomeController {
 	private static final String FILENAME = "{filename:.+}";
 
 	private final ImageService imageService;
+	private final CommentReaderRepository repository;
 
-	public HomeController(ImageService imageService) {
+	public HomeController(ImageService imageService,
+						  CommentReaderRepository repository) {
 		this.imageService = imageService;
+		this.repository = repository;
 	}
 
 	// tag::index[]
 	@GetMapping("/")
 	public Mono<String> index(Model model) {
 		model.addAttribute("images",
-			imageService.findAllImages());
+			imageService
+				.findAllImages()
+				.flatMap(image ->
+					Mono.just(image)
+						.and(repository.findByImageId(image.getId()).collectList()))
+				.map(imageAndComments -> new HashMap<String, Object>(){{
+					put("id", imageAndComments.getT1().getId());
+					put("name", imageAndComments.getT1().getName());
+					put("comments",
+						imageAndComments.getT2());
+				}}));
 		model.addAttribute("extra",
 			"DevTools can also detect code changes too");
 		return Mono.just("index");
 	}
 	// end::index[]
 
-	@GetMapping(BASE_PATH + "/" + FILENAME + "/raw")
+	@GetMapping(value = BASE_PATH + "/" + FILENAME + "/raw",
+		produces = MediaType.IMAGE_JPEG_VALUE)
 	@ResponseBody
 	public Mono<ResponseEntity<?>> oneRawImage(
 		@PathVariable String filename) {
@@ -71,7 +87,6 @@ public class HomeController {
 				try {
 					return ResponseEntity.ok()
 						.contentLength(resource.contentLength())
-						.contentType(MediaType.IMAGE_JPEG)
 						.body(new InputStreamResource(
 							resource.getInputStream()));
 				} catch (IOException e) {
