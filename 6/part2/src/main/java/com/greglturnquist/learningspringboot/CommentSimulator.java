@@ -49,14 +49,17 @@ public class CommentSimulator {
 
 	@Scheduled(fixedRate = 100)
 	public void simulateActivity() {
-		repository.findAll().map(image -> {
-			Comment comment = new Comment();
-			comment.setImageId(image.getId());
-			comment.setComment(
-				"Comment #" + counter.getAndIncrement());
-			return controller.addComment(Mono.just(comment));
-		})
-		.subscribe();
+		repository
+			.findAll()
+			.map(image -> {
+				Comment comment = new Comment();
+				comment.setImageId(image.getId());
+				comment.setComment(
+					"Comment #" + counter.getAndIncrement());
+				return Mono.just(comment);
+			})
+			.map(controller::addComment)
+			.subscribe();
 	}
 }
 // end::tag[]

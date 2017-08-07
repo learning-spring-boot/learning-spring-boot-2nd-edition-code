@@ -21,8 +21,10 @@ import reactor.core.publisher.Mono;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.annotation.Input;
+import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.cloud.stream.annotation.StreamListener;
-import org.springframework.cloud.stream.messaging.Sink;
+import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +33,7 @@ import org.springframework.stereotype.Service;
  */
 // tag::stream-1[]
 @Service
-@EnableBinding(Sink.class)
+@EnableBinding(Processor.class)
 public class CommentService {
 	// end::stream-1[]
 
@@ -46,18 +48,18 @@ public class CommentService {
 	}
 
 	// tag::stream-2[]
-	@StreamListener(Sink.INPUT)
-	public Mono<Void> save(Flux<Comment> newComment) {
+	@StreamListener
+	@Output(Processor.OUTPUT)
+	public Flux<Void> save(@Input(Processor.INPUT) Flux<Comment> newComment) {
 		return repository
 			.saveAll(newComment)
-			.map(comment -> {
+			.flatMap(comment -> {
 				counterService.increment(
 					"comments.total.consumed");
 				counterService.increment(
 					"comments." + comment.getImageId() + ".consumed");
-				return comment;
-			})
-			.then();
+				return Mono.empty();
+			});
 	}
 	// end::stream-2[]
 

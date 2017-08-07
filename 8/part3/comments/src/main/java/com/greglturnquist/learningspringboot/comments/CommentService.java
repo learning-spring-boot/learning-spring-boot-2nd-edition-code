@@ -20,11 +20,11 @@ import reactor.core.publisher.Flux;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.annotation.Input;
+import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.cloud.stream.annotation.StreamListener;
-import org.springframework.cloud.stream.messaging.Sink;
-import org.springframework.cloud.stream.messaging.Source;
+import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Service;
 
 /**
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Service;
  */
 // tag::stream-1[]
 @Service
-@EnableBinding({Sink.class, Source.class})
+@EnableBinding(Processor.class)
 public class CommentService {
 	// end::stream-1[]
 
@@ -47,9 +47,9 @@ public class CommentService {
 	}
 
 	// tag::stream-2[]
-	@StreamListener(Sink.INPUT)
-	@SendTo(Source.OUTPUT)
-	public Flux<Comment> save(Flux<Comment> newComment) {
+	@StreamListener
+	@Output(Processor.OUTPUT)
+	public Flux<Comment> save(@Input(Processor.INPUT) Flux<Comment> newComment) {
 		return repository
 			.saveAll(newComment)
 			.map(comment -> {

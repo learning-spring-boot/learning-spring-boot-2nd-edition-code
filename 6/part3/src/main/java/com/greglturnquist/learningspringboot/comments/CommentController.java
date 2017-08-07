@@ -49,15 +49,15 @@ public class CommentController {
 			FluxSink.OverflowStrategy.IGNORE)
 			.publish()
 			.autoConnect();
-
 	}
 
 	@PostMapping("/comments")
-	public Mono<String> addComment(Comment newComment) {
+	public Mono<String> addComment(Mono<Comment> newComment) {
 		if (commentSink != null) {
-			return Mono.fromRunnable(() -> commentSink.next(MessageBuilder
-				.withPayload(newComment)
-				.build()))
+			return newComment
+				.map(comment -> commentSink.next(MessageBuilder
+					.withPayload(comment)
+					.build()))
 				.then(Mono.just("redirect:/"));
 		} else {
 			return Mono.just("redirect:/");

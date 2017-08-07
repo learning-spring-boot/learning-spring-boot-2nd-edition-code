@@ -50,17 +50,16 @@ public class CommentService {
 	// tag::stream-2[]
 	@StreamListener
 	@Output(Processor.OUTPUT)
-	public Mono<Void> save(@Input(Processor.INPUT) Flux<Comment> newComment) {
+	public Flux<Void> save(@Input(Processor.INPUT) Flux<Comment> newComment) {
 		return repository
 			.saveAll(newComment)
-			.map(comment -> {
+			.flatMap(comment -> {
 				counterService.increment(
 					"comments.total.consumed");
 				counterService.increment(
 					"comments." + comment.getImageId() + ".consumed");
-				return comment;
-			})
-			.then();
+				return Mono.empty();
+			});
 	}
 	// end::stream-2[]
 
