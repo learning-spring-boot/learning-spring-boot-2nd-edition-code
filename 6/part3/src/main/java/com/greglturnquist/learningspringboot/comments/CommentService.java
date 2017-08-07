@@ -16,6 +16,7 @@
 package com.greglturnquist.learningspringboot.comments;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.actuate.metrics.CounterService;
@@ -49,7 +50,7 @@ public class CommentService {
 	// tag::stream-2[]
 	@StreamListener
 	@Output(Processor.OUTPUT)
-	public Flux<Comment> save(@Input(Processor.INPUT) Flux<Comment> newComment) {
+	public Mono<Void> save(@Input(Processor.INPUT) Flux<Comment> newComment) {
 		return repository
 			.saveAll(newComment)
 			.map(comment -> {
@@ -58,7 +59,8 @@ public class CommentService {
 				counterService.increment(
 					"comments." + comment.getImageId() + ".consumed");
 				return comment;
-			});
+			})
+			.then();
 	}
 	// end::stream-2[]
 

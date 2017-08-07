@@ -7,8 +7,10 @@ spring:
     stream:
       bindings:
         input:
+          destination: learning-spring-boot-comments
           group: learning-spring-boot
         output:
+          destination: learning-spring-boot-comments
           group: learning-spring-boot
 logging:
   level:
