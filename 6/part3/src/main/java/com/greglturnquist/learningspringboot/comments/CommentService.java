@@ -50,9 +50,10 @@ public class CommentService {
 	// tag::stream-2[]
 	@StreamListener
 	@Output(Processor.OUTPUT)
-	public Flux<Void> save(@Input(Processor.INPUT) Flux<Comment> newComment) {
+	public Flux<Void> save(@Input(Processor.INPUT)
+						   Flux<Comment> newComments) {
 		return repository
-			.saveAll(newComment)
+			.saveAll(newComments)
 			.flatMap(comment -> {
 				counterService.increment(
 					"comments.total.consumed");

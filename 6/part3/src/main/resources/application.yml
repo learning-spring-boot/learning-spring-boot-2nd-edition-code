@@ -1,8 +1,5 @@
-
+# tag::settings[]
 spring:
-  http:
-    multipart:
-      max-file-size: 10MB
   cloud:
     stream:
       bindings:
@@ -12,11 +9,12 @@ spring:
         output:
           destination: learning-spring-boot-comments
           group: learning-spring-boot
+# end::settings[]
+# tag::logs[]
 logging:
   level:
     org:
-      rabbitmq: TRACE
       springframework:
-        amqp: TRACE
-        cloud: TRACE
-        integration: TRACE
+        cloud: DEBUG
+        integration: DEBUG
+# end::logs[]

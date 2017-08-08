@@ -47,8 +47,8 @@ public class CommentController {
 		this.flux = Flux.<Message<Comment>>create(
 			emitter -> this.commentSink = emitter,
 			FluxSink.OverflowStrategy.IGNORE)
-			.publish()
-			.autoConnect();
+				.publish()
+				.autoConnect();
 	}
 
 	@PostMapping("/comments")
@@ -65,8 +65,7 @@ public class CommentController {
 	}
 
 	@StreamEmitter
-	@Output(Source.OUTPUT)
-	public void emit(FluxSender output) {
+	public void emit(@Output(Source.OUTPUT) FluxSender output) {
 		output.send(this.flux);
 	}
 
