@@ -56,8 +56,8 @@ public class HomeController {
 				.map(image -> new HashMap<String, Object>() {{
 					put("id", image.getId());
 					put("name", image.getName());
-					// tag::comments[]
 					put("comments",
+						// tag::comments[]
 						restTemplate.exchange(
 							"http://COMMENTS/comments/{imageId}",
 							HttpMethod.GET,

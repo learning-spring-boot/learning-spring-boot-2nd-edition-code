@@ -15,7 +15,7 @@
  */
 package com.greglturnquist.learningspringboot.ops;
 
-import org.springframework.boot.actuate.autoconfigure.ExportMetricReader;
+import org.springframework.boot.actuate.autoconfigure.metrics.ExportMetricReader;
 import org.springframework.boot.actuate.metrics.repository.InMemoryMetricRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;

@@ -15,13 +15,15 @@
  */
 package com.greglturnquist.learningspringboot;
 
+import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import reactor.core.publisher.Mono;
-
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import com.greglturnquist.learningspringboot.comments.Comment;
 import com.greglturnquist.learningspringboot.comments.CommentController;
@@ -47,10 +49,11 @@ public class CommentSimulator {
 		this.counter = new AtomicInteger(1);
 	}
 
-	@Scheduled(fixedRate = 100)
-	public void simulateActivity() {
-		repository
-			.findAll()
+	@EventListener
+	public void onApplicationReadyEvent(ApplicationReadyEvent event) {
+		Flux
+			.interval(Duration.ofMillis(1000))
+			.flatMap(tick -> repository.findAll())
 			.map(image -> {
 				Comment comment = new Comment();
 				comment.setImageId(image.getId());
@@ -58,8 +61,11 @@ public class CommentSimulator {
 					"Comment #" + counter.getAndIncrement());
 				return Mono.just(comment);
 			})
-			.map(controller::addComment)
+			.flatMap(newComment ->
+				Mono.defer(() ->
+					controller.addComment(newComment)))
 			.subscribe();
 	}
+
 }
 // end::tag[]
