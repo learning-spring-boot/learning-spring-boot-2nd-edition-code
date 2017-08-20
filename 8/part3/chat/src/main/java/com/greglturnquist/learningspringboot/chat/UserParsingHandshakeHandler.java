@@ -19,8 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
 import org.springframework.web.reactive.socket.WebSocketHandler;
@@ -29,34 +27,33 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 /**
  * @author Greg Turnquist
  */
+// tag::code[]
 abstract class UserParsingHandshakeHandler implements WebSocketHandler {
-
-	private static final Logger log = LoggerFactory.getLogger(UserParsingHandshakeHandler.class);
-
+	
 	private final Map<String, String> userMap;
 
 	UserParsingHandshakeHandler() {
 		this.userMap = new HashMap<>();
 	}
 
-
-	String getUser(String id) {
-		return userMap.get(id);
-	}
-
 	@Override
 	public final Mono<Void> handle(WebSocketSession session) {
 
-		this.userMap.put(session.getId(), Stream.of(session.getHandshakeInfo().getUri().getQuery().split("&"))
-			.map(s -> s.split("="))
-			.filter(strings -> strings[0].equals("user"))
-			.findFirst()
-			.map(strings -> strings[1])
-			.orElse(""));
+		this.userMap.put(session.getId(),
+				Stream.of(session.getHandshakeInfo().getUri().getQuery().split("&"))
+					.map(s -> s.split("="))
+					.filter(strings -> strings[0].equals("user"))
+					.findFirst()
+					.map(strings -> strings[1])
+					.orElse(""));
 
 		return handleInternal(session);
 	}
 
 	abstract protected Mono<Void> handleInternal(WebSocketSession session);
 
+	String getUser(String id) {
+		return userMap.get(id);
+	}
 }
+// end::code[]

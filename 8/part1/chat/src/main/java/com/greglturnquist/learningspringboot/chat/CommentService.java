@@ -15,33 +15,34 @@
  */
 package com.greglturnquist.learningspringboot.chat;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketSession;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Greg Turnquist
  */
-// tag::code[]
+// tag::code-1[]
 @Service
 @EnableBinding(Sink.class)
 public class CommentService implements WebSocketHandler {
 
 	private final static Logger log =
 		LoggerFactory.getLogger(CommentService.class);
+	// end::code-1[]
 
+	// tag::code-2[]
 	private ObjectMapper mapper;
 	private Flux<Comment> flux;
 	private FluxSink<Comment> webSocketCommentSink;
@@ -54,7 +55,9 @@ public class CommentService implements WebSocketHandler {
 				.publish()
 				.autoConnect();
 	}
+	// end::code-2[]
 
+	// tag::broadcast[]
 	@StreamListener(Sink.INPUT)
 	public void broadcast(Comment comment) {
 		if (webSocketCommentSink != null) {
@@ -63,7 +66,9 @@ public class CommentService implements WebSocketHandler {
 			webSocketCommentSink.next(comment);
 		}
 	}
+	// end::broadcast[]
 
+	// tag::handle[]
 	@Override
 	public Mono<Void> handle(WebSocketSession session) {
 		return session.send(this.flux
@@ -79,6 +84,7 @@ public class CommentService implements WebSocketHandler {
 			.log("wrap-as-websocket-message"))
 		.log("publish-to-websocket");
 	}
+	// end::handle[]
 
 }
 // end::code[]

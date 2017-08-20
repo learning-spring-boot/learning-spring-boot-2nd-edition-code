@@ -30,10 +30,12 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 /**
  * @author Greg Turnquist
  */
+// tag::code-1[]
 @Service
 @EnableBinding(ChatServiceStreams.class)
 public class OutboundChatService extends UserParsingHandshakeHandler {
-
+	//end::code-1[]
+	
 	private final static Logger log =
 		LoggerFactory.getLogger(CommentService.class);
 
@@ -57,17 +59,22 @@ public class OutboundChatService extends UserParsingHandshakeHandler {
 		}
 	}
 
+	// tag::code-2[]
 	@Override
 	protected Mono<Void> handleInternal(WebSocketSession session) {
-		return session.send(this.flux
-			.filter(s -> validate(s, getUser(session.getId())))
-			.map(this::transform)
-			.map(session::textMessage)
-			.log(getUser(session.getId()) + "-outbound-wrap-as-websocket-message"))
-			.log(getUser(session.getId()) + "-outbound-publish-to-websocket");
-
+		return session
+			.send(this.flux
+				.filter(s -> validate(s, getUser(session.getId())))
+				.map(this::transform)
+				.map(session::textMessage)
+				.log(getUser(session.getId()) +
+					"-outbound-wrap-as-websocket-message"))
+			.log(getUser(session.getId()) +
+				"-outbound-publish-to-websocket");
 	}
+	// end::code-2[]
 
+	// tag::code-3[]
 	private boolean validate(Message<String> message, String user) {
 		if (message.getPayload().startsWith("@")) {
 			String targetUser = message.getPayload()
@@ -81,7 +88,9 @@ public class OutboundChatService extends UserParsingHandshakeHandler {
 			return true;
 		}
 	}
+	// end::code-3[]
 
+	// tag::code-4[]
 	private String transform(Message<String> message) {
 		String user = message.getHeaders()
 			.get(ChatServiceStreams.USER_HEADER, String.class);
@@ -91,4 +100,5 @@ public class OutboundChatService extends UserParsingHandshakeHandler {
 			return "(" + user + ")(all): " + message.getPayload();
 		}
 	}
+	// end::code-4[]
 }

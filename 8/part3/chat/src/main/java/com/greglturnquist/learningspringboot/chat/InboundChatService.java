@@ -37,16 +37,6 @@ public class InboundChatService extends UserParsingHandshakeHandler {
 		this.chatServiceStreams = chatServiceStreams;
 	}
 
-	public Mono<?> broadcast(String message, String user) {
-		return Mono.fromRunnable(() -> {
-			chatServiceStreams.clientToBroker().send(
-				MessageBuilder
-					.withPayload(message)
-					.setHeader(ChatServiceStreams.USER_HEADER, user)
-					.build());
-		});
-	}
-
 	@Override
 	protected Mono<Void> handleInternal(WebSocketSession session) {
 		return session
@@ -58,5 +48,16 @@ public class InboundChatService extends UserParsingHandshakeHandler {
 			.log(getUser(session.getId()) + "-inbound-broadcast-to-broker")
 			.then();
 	}
+
+	public Mono<?> broadcast(String message, String user) {
+		return Mono.fromRunnable(() -> {
+			chatServiceStreams.clientToBroker().send(
+				MessageBuilder
+					.withPayload(message)
+					.setHeader(ChatServiceStreams.USER_HEADER, user)
+					.build());
+		});
+	}
+
 }
 // end::code[]

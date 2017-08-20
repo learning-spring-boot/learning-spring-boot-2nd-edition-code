@@ -34,6 +34,7 @@ import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAd
 public class WebSocketConfig {
 // end::websocket-1[]
 
+	// tag::websocket-config[]
 	@Bean
 	HandlerMapping webSocketMapping(CommentService commentService,
 									InboundChatService inboundChatService,
@@ -57,6 +58,7 @@ public class WebSocketConfig {
 
 		return mapping;
 	}
+	// end::websocket-config[]
 
 	@Bean
 	WebSocketHandlerAdapter handlerAdapter() {

@@ -60,16 +60,7 @@ dependencies {
 	compile('org.springframework.cloud:spring-cloud-starter-config')
 
 	compile('org.projectlombok:lombok')
-
-	// tag::websocket[]
-	compile('org.webjars:requirejs:2.2.0')
-	compile('org.webjars.npm:stompjs:2.3.3') {
-		// We are using SockJS for websocket functionality
-		exclude module: 'websocket'
-	}
-	compile('org.webjars.bower:sockjs-client:1.1.0')
-	// end::websocket[]
-
+	
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile("io.projectreactor:reactor-test")
 }

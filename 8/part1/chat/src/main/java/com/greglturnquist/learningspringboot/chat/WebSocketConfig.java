@@ -34,6 +34,7 @@ import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAd
 public class WebSocketConfig {
 // end::websocket-1[]
 
+	// tag::websocket-2[]
 	@Bean
 	HandlerMapping webSocketMapping(CommentService commentService) {
 		Map<String, WebSocketHandler> urlMap = new HashMap<>();
@@ -51,9 +52,12 @@ public class WebSocketConfig {
 
 		return mapping;
 	}
+	// end::websocket-2[]
 
+	// tag::websocket-3[]
 	@Bean
 	WebSocketHandlerAdapter handlerAdapter() {
 		return new WebSocketHandlerAdapter();
 	}
+	// end::websocket-3[]
 }

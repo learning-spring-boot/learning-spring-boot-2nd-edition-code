@@ -15,6 +15,8 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 
 import org.springframework.boot.CommandLineRunner;
@@ -36,6 +38,8 @@ import org.springframework.stereotype.Service;
 public class CommentService {
 	// end::stream-1[]
 
+	private static final Logger log = LoggerFactory.getLogger(CommentService.class);
+
 	private final CommentRepository repository;
 
 	private final CounterService counterService;
@@ -53,6 +57,7 @@ public class CommentService {
 		return repository
 			.saveAll(newComment)
 			.map(comment -> {
+				log.info("Saving new comment " + comment);
 				counterService.increment(
 					"comments.total.consumed");
 				counterService.increment(

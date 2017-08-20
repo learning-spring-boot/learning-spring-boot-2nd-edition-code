@@ -38,15 +38,6 @@ public class InboundChatService implements WebSocketHandler {
 		this.chatServiceStreams = chatServiceStreams;
 	}
 
-	public Mono<?> broadcast(String message) {
-		return Mono.fromRunnable(() -> {
-			chatServiceStreams.clientToBroker().send(
-				MessageBuilder
-					.withPayload(message)
-					.build());
-		});
-	}
-
 	@Override
 	public Mono<Void> handle(WebSocketSession session) {
 		return session
@@ -59,6 +50,15 @@ public class InboundChatService implements WebSocketHandler {
 			.flatMap(this::broadcast)
 			.log("inbound-broadcast-to-broker")
 			.then();
+	}
+	
+	public Mono<?> broadcast(String message) {
+		return Mono.fromRunnable(() -> {
+			chatServiceStreams.clientToBroker().send(
+					MessageBuilder
+							.withPayload(message)
+							.build());
+		});
 	}
 }
 // end::code[]
