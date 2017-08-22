@@ -40,10 +40,12 @@ public class WebSocketConfig {
 		Map<String, WebSocketHandler> urlMap = new HashMap<>();
 		urlMap.put("/topic/comments.new", commentService);
 
-		Map<String, CorsConfiguration> corsConfigurationMap = new HashMap<>();
+		Map<String, CorsConfiguration> corsConfigurationMap =
+			new HashMap<>();
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
 		corsConfiguration.addAllowedOrigin("http://localhost:8080");
-		corsConfigurationMap.put("/topic/comments.new", corsConfiguration);
+		corsConfigurationMap.put(
+			"/topic/comments.new", corsConfiguration);
 
 		SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
 		mapping.setOrder(10);

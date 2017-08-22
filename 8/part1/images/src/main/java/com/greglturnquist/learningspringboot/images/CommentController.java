@@ -71,7 +71,8 @@ public class CommentController {
 				.flatMap(comment -> {
 					counterService.increment("comments.total.produced");
 					counterService.increment(
-						"comments." + comment.getImageId() + ".produced");
+						"comments." +
+							comment.getImageId() + ".produced");
 					return Mono.just(ResponseEntity.noContent().build());
 				});
 		} else {

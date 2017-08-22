@@ -33,7 +33,8 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 // tag::code-1[]
 @Service
 @EnableBinding(ChatServiceStreams.class)
-public class OutboundChatService extends UserParsingHandshakeHandler {
+public class OutboundChatService
+				extends UserParsingHandshakeHandler {
 	//end::code-1[]
 	
 	private final static Logger log =

@@ -33,7 +33,7 @@ public class InboundChatService extends UserParsingHandshakeHandler {
 
 	private final ChatServiceStreams chatServiceStreams;
 
-	public InboundChatService(ChatServiceStreams chatServiceStreams) {
+	public InboundChatService(ChatServiceStreams chatServiceStreams){
 		this.chatServiceStreams = chatServiceStreams;
 	}
 
@@ -41,11 +41,15 @@ public class InboundChatService extends UserParsingHandshakeHandler {
 	protected Mono<Void> handleInternal(WebSocketSession session) {
 		return session
 			.receive()
-			.log(getUser(session.getId()) + "-inbound-incoming-chat-message")
+			.log(getUser(session.getId())
+				+ "-inbound-incoming-chat-message")
 			.map(WebSocketMessage::getPayloadAsText)
-			.log(getUser(session.getId()) + "-inbound-convert-to-text")
-			.flatMap(message -> broadcast(message, getUser(session.getId())))
-			.log(getUser(session.getId()) + "-inbound-broadcast-to-broker")
+			.log(getUser(session.getId())
+				+ "-inbound-convert-to-text")
+			.flatMap(message ->
+				broadcast(message, getUser(session.getId())))
+			.log(getUser(session.getId())
+				+ "-inbound-broadcast-to-broker")
 			.then();
 	}
 

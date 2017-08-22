@@ -28,7 +28,8 @@ import org.springframework.web.reactive.socket.WebSocketSession;
  * @author Greg Turnquist
  */
 // tag::code[]
-abstract class UserParsingHandshakeHandler implements WebSocketHandler {
+abstract class UserParsingHandshakeHandler
+				implements WebSocketHandler {
 	
 	private final Map<String, String> userMap;
 
@@ -40,7 +41,8 @@ abstract class UserParsingHandshakeHandler implements WebSocketHandler {
 	public final Mono<Void> handle(WebSocketSession session) {
 
 		this.userMap.put(session.getId(),
-				Stream.of(session.getHandshakeInfo().getUri().getQuery().split("&"))
+				Stream.of(session.getHandshakeInfo().getUri()
+							.getQuery().split("&"))
 					.map(s -> s.split("="))
 					.filter(strings -> strings[0].equals("user"))
 					.findFirst()
@@ -50,7 +52,8 @@ abstract class UserParsingHandshakeHandler implements WebSocketHandler {
 		return handleInternal(session);
 	}
 
-	abstract protected Mono<Void> handleInternal(WebSocketSession session);
+	abstract protected Mono<Void> handleInternal(
+							WebSocketSession session);
 
 	String getUser(String id) {
 		return userMap.get(id);

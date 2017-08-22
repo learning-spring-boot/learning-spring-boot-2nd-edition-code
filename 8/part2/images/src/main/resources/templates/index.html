@@ -112,15 +112,16 @@
                     }
                     <!-- end::chat-2[] -->
 
-                    <!-- tag::chat-3[] -->
-    				var inboundChatMessages = new WebSocket('ws://localhost:8200/topic/chatMessage.new');
-                    // Listen for new chat messages
-				    inboundChatMessages.onmessage = function(event) {
-                    	console.log('Received ' + event.data);
-                        var chatDisplay = document.getElementById('chatDisplay');
-                        chatDisplay.value = chatDisplay.value + event.data + '\n';
-                    };
-                    <!-- end::chat-3[] -->
+				<!-- tag::chat-3[] -->
+				var inboundChatMessages =
+					new WebSocket('ws://localhost:8200/topic/chatMessage.new');
+				// Listen for new chat messages
+				inboundChatMessages.onmessage = function (event) {
+					console.log('Received ' + event.data);
+					var chatDisplay = document.getElementById('chatDisplay');
+					chatDisplay.value = chatDisplay.value + event.data + '\n';
+				};
+				<!-- end::chat-3[] -->
 
                     document.getElementById('chatInput').focus();
             })();
