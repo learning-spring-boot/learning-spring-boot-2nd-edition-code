@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -51,8 +52,9 @@ public class HomeController {
 
 	@GetMapping("/")
 	public Mono<String> index(Model model,
-							  @RequestHeader("SESSION") String sessionId,
+							  WebSession session,
 							  @AuthenticationPrincipal Mono<UsernamePasswordAuthenticationToken> user) {
+		String sessionId = session.getId();
 		// tag::owner[]
 		System.out.println("sessionId = " + sessionId);
 		System.out.println("user = " + user.block());

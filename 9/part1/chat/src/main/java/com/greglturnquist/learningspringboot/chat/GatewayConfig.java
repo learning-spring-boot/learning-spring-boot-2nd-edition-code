@@ -67,7 +67,7 @@ public class GatewayConfig {
 					.mutate()
 					.request(exchange.getRequest()
 						.mutate()
-						.header("SESSION", webSession.getId())
+						.header("Cookie", "SESSION="+webSession.getId())
 						.build())
 					.build())
 				.flatMap(chain::filter);

@@ -54,10 +54,10 @@ public class SecurityConfiguration {
 												   UserRepository repository) throws Exception {
 		repository.deleteAll();
 		repository.save(new User(null, "greg", "turnquist",
-			new String[]{"ROLE_USER", "ROLE_ADMIN"}));
+			new String[]{"ROLE_USER", "ROLE_ADMIN"})).block();
 
 		repository.save(new User(null, "phil", "webb",
-			new String[]{"ROLE_USER"}));
+			new String[]{"ROLE_USER"})).block();
 
 		UserDetails greg = userDetailsService.loadUserByUsername("greg");
 		UserDetails phil = userDetailsService.loadUserByUsername("phil");
