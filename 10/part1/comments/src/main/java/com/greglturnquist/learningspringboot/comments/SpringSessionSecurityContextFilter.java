@@ -15,46 +15,34 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
-import java.io.IOException;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.session.Session;
-import org.springframework.session.SessionRepository;
 import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * @author Greg Turnquist
  */
 @Component
-public class SpringSessionSecurityContextFilter extends OncePerRequestFilter {
+public class SpringSessionSecurityContextFilter /*extends OncePerRequestFilter*/ {
 
-	private final SessionRepository sessionRepository;
-
-	public SpringSessionSecurityContextFilter(SessionRepository sessionRepository) {
-		this.sessionRepository = sessionRepository;
-	}
-
-	@Override
-	protected void doFilterInternal(HttpServletRequest request,
-									HttpServletResponse response,
-									FilterChain filterChain) throws ServletException, IOException {
-		String sessionId = request.getHeader("SESSION");
-		if (sessionId != null) {
-			Session session = sessionRepository.findById(sessionId);
-			if (session != null) {
-				SecurityContextHolder.setContext(
-					session.getAttribute(
-						HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY));
-			}
-		}
-		filterChain.doFilter(request, response);
-	}
+//	private final SessionRepository sessionRepository;
+//
+//	public SpringSessionSecurityContextFilter(SessionRepository sessionRepository) {
+//		this.sessionRepository = sessionRepository;
+//	}
+//
+//	@Override
+//	protected void doFilterInternal(HttpServletRequest request,
+//									HttpServletResponse response,
+//									FilterChain filterChain) throws ServletException, IOException {
+//		String sessionId = request.getHeader("SESSION");
+//		if (sessionId != null) {
+//			Session session = sessionRepository.findById(sessionId);
+//			if (session != null) {
+//				SecurityContextHolder.setContext(
+//					session.getAttribute(
+//						HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY));
+//			}
+//		}
+//		filterChain.doFilter(request, response);
+//	}
 
 }

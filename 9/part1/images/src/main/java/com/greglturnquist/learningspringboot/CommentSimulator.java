@@ -70,7 +70,7 @@ public class CommentSimulator {
 	public void simulateUsersClicking() {
 		homeController.index(
 			new BindingAwareModelMap(),
-			null);
+			null, null);
 	}
 }
 // end::tag[]

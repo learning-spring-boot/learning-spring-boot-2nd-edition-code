@@ -15,40 +15,36 @@
  */
 package com.greglturnquist.learningspringboot.chat;
 
-import com.netflix.zuul.ZuulFilter;
-import com.netflix.zuul.context.RequestContext;
-import org.springframework.stereotype.Component;
-
 /**
  * @author Greg Turnquist
  */
 // tag::code[]
-@Component
-public class SessionHeaderLoadingZuulPreFilter extends ZuulFilter {
+//@Component
+public class SessionHeaderLoadingZuulPreFilter /*extends ZuulFilter*/ {
 
-	@Override
-	public String filterType() {
-		return "pre";
-	}
-
-	@Override
-	public int filterOrder() {
-		return 0;
-	}
-
-	@Override
-	public boolean shouldFilter() {
-		return true;
-	}
-
-	@Override
-	public Object run() {
-		RequestContext context = RequestContext.getCurrentContext();
-
-		context.addZuulRequestHeader("SESSION",
-			context.getRequest().getSession().getId());
-
-		return null;
-	}
+//	@Override
+//	public String filterType() {
+//		return "pre";
+//	}
+//
+//	@Override
+//	public int filterOrder() {
+//		return 0;
+//	}
+//
+//	@Override
+//	public boolean shouldFilter() {
+//		return true;
+//	}
+//
+//	@Override
+//	public Object run() {
+//		RequestContext context = RequestContext.getCurrentContext();
+//
+//		context.addZuulRequestHeader("SESSION",
+//			context.getRequest().getSession().getId());
+//
+//		return null;
+//	}
 }
 // end::code[]

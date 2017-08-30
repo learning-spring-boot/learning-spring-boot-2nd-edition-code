@@ -16,19 +16,28 @@
 package com.greglturnquist.learningspringboot;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.core.ReactiveMongoOperations;
+import org.springframework.session.EnableSpringWebSession;
+import org.springframework.session.data.mongo.AbstractMongoSessionConverter;
 import org.springframework.session.data.mongo.JdkMongoSessionConverter;
-import org.springframework.session.data.mongo.config.annotation.web.http.EnableMongoHttpSession;
+import org.springframework.session.data.mongo.ReactiveMongoOperationsSessionRepository;
 
 /**
  * @author Greg Turnquist
  */
-@Configuration
-@EnableMongoHttpSession
+@EnableSpringWebSession
 public class SessionConfig {
 
 	@Bean
-	public JdkMongoSessionConverter sessionConverter() {
+	JdkMongoSessionConverter mongoSessionConverter() {
 		return new JdkMongoSessionConverter();
+	}
+
+	@Bean
+	public ReactiveMongoOperationsSessionRepository reactiveMongoOperationsSessionRepository(
+		ReactiveMongoOperations operations, AbstractMongoSessionConverter sessionConverter) {
+		ReactiveMongoOperationsSessionRepository repository = new ReactiveMongoOperationsSessionRepository(operations);
+		repository.setMongoSessionConverter(sessionConverter);
+		return repository;
 	}
 }

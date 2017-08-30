@@ -16,11 +16,11 @@
 package com.greglturnquist.learningspringboot.chat;
 
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.*;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 /**
  * @author Greg Turnquist
@@ -36,14 +36,15 @@ public class SpringDataUserDetailsService implements UserDetailsService {
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		return Optional.of(repository.findByUsername(username))
-			.map(user ->
-				new User(
-					user.getUsername(),
-					user.getPassword(),
-					AuthorityUtils.createAuthorityList(user.getRoles())))
-			.orElse(null);
+	public UserDetails loadUserByUsername(String username)
+							throws UsernameNotFoundException {
+		return repository.findByUsername(username)
+			.map(user -> new User(
+				user.getUsername(),
+				user.getPassword(),
+				AuthorityUtils.createAuthorityList(user.getRoles())
+			))
+			.block();
 	}
 }
 // end::code[]

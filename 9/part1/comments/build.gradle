@@ -1,6 +1,6 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+		springBootVersion = '2.0.0.M3'
 		springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
 	}
 	repositories {
@@ -44,10 +44,11 @@ configurations {
 	all*.exclude group: 'org.springframework', module: 'spring-webmvc'
 }
 
-ext['reactor.version'] = '3.0.3.RELEASE'
+ext['spring-session.version'] = '2.0.0.BUILD-SNAPSHOT'
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
+	compile('org.springframework.boot:spring-boot-starter-webflux')
 	compile('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
 	compile('org.springframework.boot:spring-boot-devtools')
 	compile('org.springframework.cloud:spring-cloud-starter-stream-rabbit')

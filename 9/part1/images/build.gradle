@@ -1,7 +1,8 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+		springBootVersion = '2.0.0.M3'
 		springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
+		reactorVersion = 'Bismuth-BUILD-SNAPSHOT'
 	}
 	repositories {
 		mavenCentral()
@@ -45,10 +46,9 @@ configurations {
 	all*.exclude group: 'org.springframework', module: 'spring-webmvc'
 }
 
-configurations {
-	all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
-	all*.exclude group: 'org.springframework', module: 'spring-webmvc'
-}
+ext['spring.version'] = '5.0.0.BUILD-SNAPSHOT'
+ext['spring-security.version'] = '5.0.0.BUILD-SNAPSHOT'
+ext['spring-session.version'] = '2.0.0.BUILD-SNAPSHOT'
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')
@@ -65,6 +65,7 @@ dependencies {
 	compile('org.projectlombok:lombok')
 
 	// tag::spring-session[]
+	compile('org.springframework.security:spring-security-config')
 	compile('org.springframework.security:spring-security-webflux')
 	compile('org.springframework.session:spring-session-data-mongodb:2.0.0.BUILD-SNAPSHOT')
 	// end::spring-session[]
@@ -79,5 +80,6 @@ dependencies {
 dependencyManagement {
 	imports {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+		mavenBom "io.projectreactor:reactor-bom:${reactorVersion}"
 	}
 }

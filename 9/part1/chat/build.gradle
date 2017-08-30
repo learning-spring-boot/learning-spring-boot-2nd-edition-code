@@ -1,6 +1,6 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+		springBootVersion = '2.0.0.M3'
 		springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
 	}
 	repositories {
@@ -45,6 +45,10 @@ configurations {
 	all*.exclude group: 'org.springframework', module: 'spring-webmvc'
 }
 
+//ext['spring.version'] = '5.0.0.BUILD-SNAPSHOT'
+//ext['spring-security.version'] = '5.0.0.BUILD-SNAPSHOT'
+ext['spring-session.version'] = '2.0.0.BUILD-SNAPSHOT'
+
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')
 	compile('org.springframework.boot:spring-boot-starter-actuator')
@@ -57,13 +61,10 @@ dependencies {
 	compile('org.springframework.cloud:spring-cloud-starter-hystrix')
 	compile('org.springframework.cloud:spring-cloud-starter-config')
 
-	compile('org.webjars:requirejs:2.2.0')
-	compile('org.webjars.npm:stompjs:2.3.3') {
-		exclude module: 'websocket' // We are using SockJS for websocket functionality
-	}
-	compile('org.webjars.bower:sockjs-client:1.1.0')
-
+	compile('org.springframework.security:spring-security-config')
 	compile('org.springframework.security:spring-security-webflux')
+
+	compile('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
 
 	compile('org.springframework.session:spring-session-data-mongodb:2.0.0.BUILD-SNAPSHOT')
 

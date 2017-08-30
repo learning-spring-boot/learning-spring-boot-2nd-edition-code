@@ -27,8 +27,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.safari.SafariDriver;
-
-import org.springframework.boot.test.util.EnvironmentTestUtils;
+import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -57,8 +56,8 @@ public class WebDriverAutoConfigurationTests {
 		if (configs.length > 0) {
 			applicationContext.register(configs);
 		}
-		EnvironmentTestUtils
-			.addEnvironment(applicationContext, environment);
+		TestPropertyValues.of(environment)
+			.applyTo(applicationContext);
 		applicationContext.refresh();
 		this.context = applicationContext;
 	}

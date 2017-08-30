@@ -19,10 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
-
 import reactor.core.publisher.Mono;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -70,7 +67,7 @@ public class HomeController {
 
 	@GetMapping("/token")
 	@ResponseBody
-	public Mono<Map<String, String>> token(HttpSession session) {
-		return Mono.just(Collections.singletonMap("token", session.getId()));
+	public Mono<Map<String, String>> token(@RequestHeader("SESSION") String sessionId) {
+		return Mono.just(Collections.singletonMap("token", sessionId));
 	}
 }

@@ -5,3 +5,37 @@ spring:
     config:
       label: session
       password: password
+      
+    gateway:
+      routes:
+      # ========================================================
+      - id: imagesService
+        uri: lb://IMAGES
+        predicates:
+        - Path=/imagesService/**
+        filters:
+        - RewritePath=/imagesService/(?<segment>.*), /$\{segment}
+        - RewritePath=/imagesService, /
+        - SaveSession
+        - EmbedSessionHeader
+      - id: images
+        uri: lb://IMAGES
+        predicates:
+        - Path=/images/**
+      - id: mainCss
+        uri: lb://IMAGES
+        predicates:
+        - Path=/main.css
+      - id: commentsService
+        uri: lb://IMAGES
+        predicates:
+        - Path=/comments/**
+
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.http.server.reactive: DEBUG
+    org.springframework.session: TRACE
+    org.springframework.web.reactive: DEBUG
+    reactor.ipc.netty: DEBUG

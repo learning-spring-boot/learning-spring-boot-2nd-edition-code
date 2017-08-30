@@ -15,29 +15,48 @@
  */
 package com.greglturnquist.learningspringboot.chat;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.reactive.HandlerMapping;
+import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
+import org.springframework.web.reactive.socket.WebSocketHandler;
+import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter;
 
 /**
  * @author Greg Turnquist
  */
 // tag::secured-1[]
 @Configuration
-//@EnableWebSocketMessageBroker
-public class WebSocketConfig /*extends AbstractSecurityWebSocketMessageBrokerConfigurer*/ {
+public class WebSocketConfig {
 	// end::secured-1[]
 
 	// tag::cors[]
-//	@Override
-//	public void registerStompEndpoints(StompEndpointRegistry registry) {
-//		registry.addEndpoint("/learning-spring-boot").withSockJS();
-//	}
-//	// end::cors[]
-//
-//	@Override
-//	public void configureMessageBroker(MessageBrokerRegistry registry) {
-//		registry.setApplicationDestinationPrefixes("/app");
-//		registry.enableSimpleBroker("/topic", "/queue");
-//	}
+	@Bean
+	HandlerMapping webSocketMapping(CommentService commentService,
+									InboundChatService inboundChatService,
+									OutboundChatService outboundChatService) {
+		Map<String, WebSocketHandler> urlMap = new HashMap<>();
+		urlMap.put("/topic/comments.new", commentService);
+		urlMap.put("/app/chatMessage.new", inboundChatService);
+		urlMap.put("/topic/chatMessage.new", outboundChatService);
+
+		SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
+		mapping.setOrder(10);
+		mapping.setUrlMap(urlMap);
+
+		return mapping;
+	}
+	// end::cors[]
+
+	@Bean
+	WebSocketHandlerAdapter handlerAdapter() {
+		return new WebSocketHandlerAdapter();
+	}
+
 
 	// tag::secured-2[]
 //	@Override

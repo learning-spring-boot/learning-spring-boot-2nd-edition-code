@@ -15,53 +15,47 @@
  */
 package com.greglturnquist.learningspringboot.chat;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 /**
  * @author Greg Turnquist
  */
 // tag::code[]
 @Configuration
-public class SecurityConfiguration extends
-				WebSecurityConfigurerAdapter {
+public class SecurityConfiguration /*extends
+				WebSecurityConfigurerAdapter*/ {
 
 	// tag::mongdb-users[]
-	@Autowired
-	public void globalUserDetails(AuthenticationManagerBuilder auth,
-					  SpringDataUserDetailsService userDetailsService)
-		throws Exception {
-
-		auth.userDetailsService(userDetailsService);
-	}
-
-	@Bean
-	CommandLineRunner initializeUsers(UserRepository repository) {
-		return args -> {
-			repository.save(new User(null, "greg", "turnquist",
-				new String[]{"ROLE_USER", "ROLE_ADMIN"}));
-
-			repository.save(new User(null, "phil", "webb",
-				new String[]{"ROLE_USER"}));
-		};
-	}
+//	@Autowired
+//	public void globalUserDetails(AuthenticationManagerBuilder auth,
+//					  SpringDataUserDetailsService userDetailsService)
+//		throws Exception {
+//
+//		auth.userDetailsService(userDetailsService);
+//	}
+//
+//	@Bean
+//	CommandLineRunner initializeUsers(UserRepository repository) {
+//		return args -> {
+//			repository.save(new User(null, "greg", "turnquist",
+//				new String[]{"ROLE_USER", "ROLE_ADMIN"}));
+//
+//			repository.save(new User(null, "phil", "webb",
+//				new String[]{"ROLE_USER"}));
+//		};
+//	}
 	// end::mongodb-users[]
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http
-			.httpBasic()
-				.and()
-			.formLogin()
-				.and()
-			.authorizeRequests()
-				.antMatchers("/**").authenticated();
-	}
+//	@Override
+//	protected void configure(HttpSecurity http) throws Exception {
+//		http
+//			.httpBasic()
+//				.and()
+//			.formLogin()
+//				.and()
+//			.authorizeRequests()
+//				.antMatchers("/**").authenticated();
+//	}
 
 }
 // end::code[]
