@@ -15,11 +15,13 @@
  */
 package com.greglturnquist.learningspringboot.chat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.HttpSecurity;
-import org.springframework.security.core.userdetails.MapUserDetailsRepository;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
 /**
@@ -29,43 +31,33 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @EnableWebFluxSecurity
 public class SecurityConfiguration {
 
+	private static final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
+
 	// tag::mongodb-users[]
-//	@Autowired
-//	public void globalUserDetails(AuthenticationManagerBuilder auth,
-//					  SpringDataUserDetailsService userDetailsService)
-//		throws Exception {
-//
-//		auth.userDetailsService(userDetailsService);
-//	}
-
-//	@Bean
-//	CommandLineRunner initializeUsers(UserRepository repository) {
-//		return args -> {
-//			repository.save(new User(null, "greg", "turnquist",
-//				new String[]{"ROLE_USER", "ROLE_ADMIN"}));
-//
-//			repository.save(new User(null, "phil", "webb",
-//				new String[]{"ROLE_USER"}));
-//		};
-//	}
-
 	@Bean
-	MapUserDetailsRepository userDetailsRepository(SpringDataUserDetailsService userDetailsService,
-												   UserRepository repository) throws Exception {
-		repository.deleteAll();
-		repository.save(new User(null, "greg", "turnquist",
-			new String[]{"ROLE_USER", "ROLE_ADMIN"}));
+	CommandLineRunner initializeUsers(MongoOperations operations) {
+		return args -> {
+			operations.dropCollection(User.class);
 
-		repository.save(new User(null, "phil", "webb",
-			new String[]{"ROLE_USER"}));
-
-		UserDetails greg = userDetailsService.loadUserByUsername("greg");
-		UserDetails phil = userDetailsService.loadUserByUsername("phil");
-
-		return new MapUserDetailsRepository(greg, phil);
+			operations.insert(
+				new User(
+					null,
+					"greg", "turnquist",
+					new String[]{"ROLE_USER", "ROLE_ADMIN"}));
+			operations.insert(
+				new User(
+					null,
+					"phil", "webb",
+					new String[]{"ROLE_USER"}));
+			
+			operations.findAll(User.class).forEach(user -> {
+				log.info("Loaded " + user);
+			});
+		};
 	}
 	// end::mongodb-users[]
 
+	// tag::security-filter-chain[]
 	@Bean
 	SecurityWebFilterChain springWebFilterChain(HttpSecurity http) {
 		return http
@@ -74,15 +66,6 @@ public class SecurityConfiguration {
 				.and()
 			.build();
 	}
-//	protected void configure(HttpSecurity http) throws Exception {
-//		http
-//			.httpBasic()
-//				.and()
-//			.formLogin()
-//				.and()
-//			.authorizeRequests()
-//				.antMatchers("/**").authenticated();
-//	}
-
+	// end::security-filter-chain[]
 }
 // end::code[]

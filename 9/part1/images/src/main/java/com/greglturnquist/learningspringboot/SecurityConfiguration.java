@@ -15,20 +15,12 @@
  */
 package com.greglturnquist.learningspringboot;
 
-import reactor.core.publisher.Mono;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.HttpSecurity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
-import org.springframework.session.data.mongo.ReactiveMongoOperationsSessionRepository;
-import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.server.WebFilter;
+import org.springframework.security.web.server.context.WebSessionSecurityContextRepository;
 
 /**
  * @author Greg Turnquist
@@ -42,61 +34,62 @@ public class SecurityConfiguration {
 	 * First, load authentication from current session.
 	 * Then, insert into the ServerWebExchange for downstream consumption.
 	 */
-	@Bean
-	@Order(-200)
-	WebFilter
-	loadAuthFromSessionFilter(
-				ReactiveMongoOperationsSessionRepository repository) {
-		return (exchange, chain) -> loadFromSession(exchange, repository)
-			.map(authentication -> exchange.mutate()
-				.principal(Mono.just(authentication))
-				.build())
-			.flatMap(serverWebExchange -> chain.filter(serverWebExchange));
-	}
+//	@Bean
+//	@Order(-200)
+//	WebFilter
+//	loadAuthFromSessionFilter(
+//				ReactiveMongoOperationsSessionRepository repository) {
+//		return (exchange, chain) -> loadFromSession(exchange, repository)
+//			.map(authentication -> exchange.mutate()
+//				.principal(Mono.just(authentication))
+//				.build())
+//			.flatMap(serverWebExchange -> chain.filter(serverWebExchange));
+//	}
 
 	@Bean
-	SecurityWebFilterChain springWebFilterChain(HttpSecurity http,
-					ReactiveAuthenticationManager authenticationManager) {
-		return http
+	SecurityWebFilterChain springWebFilterChain(/*HttpSecurity http,
+					ReactiveAuthenticationManager authenticationManager*/) {
+		return HttpSecurity.http()
+			.securityContextRepository(new WebSessionSecurityContextRepository())
 			.authorizeExchange()
 				.anyExchange().authenticated()
 				.and()
-			.authenticationManager(authenticationManager)
+//			.authenticationManager(authenticationManager)
 			.build();
 	}
 
-	@Bean
-	AuthenticationWebFilter authWebFilter(HttpSecurity http,
-										  ReactiveAuthenticationManager authenticationManager,
-										  ReactiveMongoOperationsSessionRepository repository) {
-		AuthenticationWebFilter authenticationWebFilter = http
-			.httpBasic()
-			.authenticationManager(authenticationManager)
-			.build();
-
-		// Replace default authentication converter with this one.
-		authenticationWebFilter.setAuthenticationConverter(exchange -> loadFromSession(exchange, repository));
-
-		return authenticationWebFilter;
-	}
+//	@Bean
+//	AuthenticationWebFilter authWebFilter(HttpSecurity http,
+//										  ReactiveAuthenticationManager authenticationManager,
+//										  ReactiveMongoOperationsSessionRepository repository) {
+//		AuthenticationWebFilter authenticationWebFilter = http
+//			.httpBasic()
+//			.authenticationManager(authenticationManager)
+//			.build();
+//
+//		// Replace default authentication converter with this one.
+//		authenticationWebFilter.setAuthenticationConverter(exchange -> loadFromSession(exchange, repository));
+//
+//		return authenticationWebFilter;
+//	}
 
 	/**
 	 * We depend on the upstream service providing user details so
 	 * we don't have to connect to the user store here.
 	 */
-	@Bean
-	ReactiveAuthenticationManager authenticationManager() {
-		return authentication -> Mono.justOrEmpty(authentication);
-	}
+//	@Bean
+//	ReactiveAuthenticationManager authenticationManager() {
+//		return authentication -> Mono.justOrEmpty(authentication);
+//	}
 
-	private static Mono<Authentication> loadFromSession(
-				ServerWebExchange exchange,
-				ReactiveMongoOperationsSessionRepository repository) {
-		return exchange.getSession()
-			.map(webSession -> webSession.getId())
-			.flatMap(id -> repository.findById(id))
-			.<SecurityContext> map(mongoSession -> mongoSession.getAttribute("USER"))
-			.map(securityContext -> securityContext.getAuthentication());
-	}
+//	private static Mono<Authentication> loadFromSession(
+//				ServerWebExchange exchange,
+//				ReactiveMongoOperationsSessionRepository repository) {
+//		return exchange.getSession()
+//			.map(webSession -> webSession.getId())
+//			.flatMap(id -> repository.findById(id))
+//			.<SecurityContext> map(mongoSession -> mongoSession.getAttribute("USER"))
+//			.map(securityContext -> securityContext.getAuthentication());
+//	}
 }
 // end::code[]

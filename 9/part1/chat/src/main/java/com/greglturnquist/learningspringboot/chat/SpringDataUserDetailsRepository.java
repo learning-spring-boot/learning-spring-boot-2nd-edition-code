@@ -15,11 +15,11 @@
  */
 package com.greglturnquist.learningspringboot.chat;
 
+import reactor.core.publisher.Mono;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.UserDetailsRepository;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,24 +27,22 @@ import org.springframework.stereotype.Component;
  */
 // tag::code[]
 @Component
-public class SpringDataUserDetailsService implements UserDetailsService {
+public class SpringDataUserDetailsRepository implements UserDetailsRepository {
 
 	private final UserRepository repository;
 
-	public SpringDataUserDetailsService(UserRepository repository) {
+	public SpringDataUserDetailsRepository(UserRepository repository) {
 		this.repository = repository;
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String username)
-							throws UsernameNotFoundException {
+	public Mono<UserDetails> findByUsername(String username) {
 		return repository.findByUsername(username)
 			.map(user -> new User(
 				user.getUsername(),
 				user.getPassword(),
 				AuthorityUtils.createAuthorityList(user.getRoles())
-			))
-			.block();
+			));
 	}
 }
 // end::code[]

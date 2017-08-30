@@ -17,7 +17,6 @@ spring:
         - RewritePath=/imagesService/(?<segment>.*), /$\{segment}
         - RewritePath=/imagesService, /
         - SaveSession
-        - EmbedSessionHeader
       - id: images
         uri: lb://IMAGES
         predicates:

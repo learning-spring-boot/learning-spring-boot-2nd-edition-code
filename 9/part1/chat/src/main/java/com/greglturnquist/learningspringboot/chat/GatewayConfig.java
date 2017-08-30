@@ -15,6 +15,8 @@
  */
 package com.greglturnquist.learningspringboot.chat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.factory.WebFilterFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,14 +31,11 @@ import org.springframework.web.server.WebSession;
 @Configuration
 public class GatewayConfig {
 
+	private static final Logger log = LoggerFactory.getLogger(GatewayConfig.class);
+
 	@Bean
 	SaveSessionWebFilterFactory saveSessionWebFilterFactory() {
 		return new SaveSessionWebFilterFactory();
-	}
-
-	@Bean
-	EmbedSessionHeaderWebFilterFactory embedSessionHeaderWebFilterFactory() {
-		return new EmbedSessionHeaderWebFilterFactory();
 	}
 
 	/**
@@ -47,30 +46,13 @@ public class GatewayConfig {
 		public WebFilter apply(Tuple args) {
 			return (exchange, chain) -> exchange.getSession()
 				.map(webSession -> {
-					System.out.println("Session id: " + webSession.getId() + " Attributes: " + webSession.getAttributes());
-					webSession.getAttributes().entrySet().forEach(entry -> System.out.println(entry.getKey() + " => " + entry.getValue()));
+					log.debug("Session id: " + webSession.getId());
+					webSession.getAttributes().entrySet().forEach(entry ->
+						log.debug(entry.getKey() + " => " + entry.getValue()));
 					return webSession;
 				})
 				.map(WebSession::save)
 				.then(chain.filter(exchange));
-		}
-	}
-
-	/**
-	 * Add a "SESSION" header with the current WebSession id.
-	 */
-	static class EmbedSessionHeaderWebFilterFactory implements WebFilterFactory {
-		@Override
-		public WebFilter apply(Tuple args) {
-			return (exchange, chain) -> exchange.getSession()
-				.map(webSession -> exchange
-					.mutate()
-					.request(exchange.getRequest()
-						.mutate()
-						.header("SESSION", webSession.getId())
-						.build())
-					.build())
-				.flatMap(chain::filter);
 		}
 	}
 }

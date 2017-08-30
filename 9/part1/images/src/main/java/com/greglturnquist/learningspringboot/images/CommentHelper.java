@@ -58,7 +58,7 @@ public class CommentHelper {
 					imagesConfiguration.getCommentsPassword();
 				String token = new String(Base64Utils.encode(credentials.getBytes()));
 				set(AUTHORIZATION, "Basic " + token);
-				set("SESSION", sessionId);
+				set("Cookie", "SESSION=" + sessionId);
 			}}),
 			new ParameterizedTypeReference<List<Comment>>() {},
 			image.getId());
