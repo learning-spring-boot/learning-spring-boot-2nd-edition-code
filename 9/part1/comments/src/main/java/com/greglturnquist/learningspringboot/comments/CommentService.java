@@ -16,7 +16,6 @@
 package com.greglturnquist.learningspringboot.comments;
 
 import reactor.core.publisher.Flux;
-
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.cloud.stream.annotation.EnableBinding;

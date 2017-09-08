@@ -31,7 +31,8 @@ public class SpringDataUserDetailsRepository implements UserDetailsRepository {
 
 	private final UserRepository repository;
 
-	public SpringDataUserDetailsRepository(UserRepository repository) {
+	public SpringDataUserDetailsRepository(UserRepository repository)
+	{
 		this.repository = repository;
 	}
 

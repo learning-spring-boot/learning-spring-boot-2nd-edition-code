@@ -37,8 +37,8 @@ public class WebSocketConfig {
 	// tag::cors[]
 	@Bean
 	HandlerMapping webSocketMapping(CommentService commentService,
-									InboundChatService inboundChatService,
-									OutboundChatService outboundChatService) {
+						InboundChatService inboundChatService,
+						OutboundChatService outboundChatService) {
 		Map<String, WebSocketHandler> urlMap = new HashMap<>();
 		urlMap.put("/topic/comments.new", commentService);
 		urlMap.put("/app/chatMessage.new", inboundChatService);
@@ -56,19 +56,4 @@ public class WebSocketConfig {
 	WebSocketHandlerAdapter handlerAdapter() {
 		return new WebSocketHandlerAdapter();
 	}
-
-
-	// tag::secured-2[]
-//	@Override
-//	protected void configureInbound(
-//		MessageSecurityMetadataSourceRegistry messages) {
-//
-//		messages
-//			.nullDestMatcher().authenticated()
-//			.simpDestMatchers("/app/**").hasRole("USER")
-//			.simpSubscribeDestMatchers(
-//				"/user/**", "/topic/**").hasRole("USER")
-//			.anyMessage().denyAll();
-//	}
-	// end::secured-2[]
 }

@@ -15,26 +15,29 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.HttpSecurity;
+import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.context.WebSessionSecurityContextRepository;
 
 /**
  * @author Greg Turnquist
  */
 // tag::code[]
-@Configuration
-public class SecurityConfiguration /*extends WebSecurityConfigurerAdapter*/ {
+@EnableWebFluxSecurity
+@EnableReactiveMethodSecurity
+public class SecurityConfiguration {
 
-//	@Autowired
-//	SpringSessionSecurityContextFilter springSessionSecurityContextFilter;
-//
-//	@Override
-//	protected void configure(HttpSecurity http) throws Exception {
-//		http
-//			.addFilterAfter(springSessionSecurityContextFilter, SessionManagementFilter.class)
-//			.httpBasic()
-//				.and()
-//			.authorizeRequests()
-//				.antMatchers("/**").authenticated();
-//	}
+	@Bean
+	SecurityWebFilterChain springWebFilterChain() {
+		return HttpSecurity.http()
+			.securityContextRepository(new WebSessionSecurityContextRepository())
+			.authorizeExchange()
+			.anyExchange().authenticated()
+			.and()
+			.build();
+	}
 }
 // end::code[]

@@ -43,6 +43,7 @@ public class WebSocketConfig {
 		urlMap.put("/app/chatMessage.new", inboundChatService);
 		urlMap.put("/topic/chatMessage.new", outboundChatService);
 
+		// tag::cors[]
 		Map<String, CorsConfiguration> corsConfigurationMap =
 			new HashMap<>();
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
@@ -53,6 +54,7 @@ public class WebSocketConfig {
 			"/app/chatMessage.new", corsConfiguration);
 		corsConfigurationMap.put(
 			"/topic/chatMessage.new", corsConfiguration);
+		// end::cors[]
 
 		SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
 		mapping.setOrder(10);

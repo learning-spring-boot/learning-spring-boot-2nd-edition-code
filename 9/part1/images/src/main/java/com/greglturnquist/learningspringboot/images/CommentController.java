@@ -18,7 +18,6 @@ package com.greglturnquist.learningspringboot.images;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
-
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Output;
@@ -30,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -53,11 +53,13 @@ public class CommentController {
 			.autoConnect();
 	}
 
+	@PreAuthorize("hasRole('USER')")
 	@PostMapping("/comments")
 	public Mono<ResponseEntity<?>> addComment(Mono<Comment> newComment) {
 		if (commentSink != null) {
 			return newComment
 				.map(comment -> {
+					System.out.println("Got " + comment);
 					commentSink.next(MessageBuilder
 						.withPayload(comment)
 						.setHeader(MessageHeaders.CONTENT_TYPE,

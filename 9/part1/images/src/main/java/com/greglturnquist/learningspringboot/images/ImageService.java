@@ -20,11 +20,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.util.UUID;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.boot.actuate.metrics.GaugeService;
@@ -34,7 +34,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
@@ -84,7 +84,8 @@ public class ImageService {
 	}
 
 	// tag::metric-2[]
-	public Mono<Void> createImage(Flux<FilePart> files) {
+	public Mono<Void> createImage(Flux<FilePart> files,
+								  Principal auth) {
 		return files
 			.log("createImage-files")
 			.flatMap(file -> {
@@ -92,8 +93,9 @@ public class ImageService {
 					new Image(
 						UUID.randomUUID().toString(),
 						file.filename(),
-						SecurityContextHolder.getContext().getAuthentication().getName()))
+						auth.getName()))
 					.log("createImage-save");
+				// end::metric-2[]
 
 				Mono<Void> copyFile = Mono.just(Paths.get(UPLOAD_ROOT, file.filename()).toFile())
 					.log("createImage-picktarget")
@@ -127,9 +129,13 @@ public class ImageService {
 			.then()
 			.log("createImage-done");
 	}
-	// end::metric-2[]
 
+	// tag::delete[]
+	@PreAuthorize("hasRole('ADMIN') or " +
+		"@imageRepository.findByName(#filename).owner " +
+		"== authentication.name")
 	public Mono<Void> deleteImage(String filename) {
+		// end::delete[]
 		Mono<Void> deleteDatabaseImage = imageRepository
 			.findByName(filename)
 			.log("deleteImage-find")

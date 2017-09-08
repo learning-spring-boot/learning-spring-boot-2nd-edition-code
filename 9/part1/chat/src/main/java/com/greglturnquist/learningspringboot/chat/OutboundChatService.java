@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
-
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.messaging.Message;
@@ -34,7 +33,7 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 @Service
 @EnableBinding(ChatServiceStreams.class)
 public class OutboundChatService
-				extends UserParsingHandshakeHandler {
+				extends AuthorizedWebSocketHandler {
 	//end::code-1[]
 	
 	private final static Logger log =
@@ -62,29 +61,30 @@ public class OutboundChatService
 
 	// tag::code-2[]
 	@Override
-	protected Mono<Void> handleInternal(WebSocketSession session) {
-		return session
-			.send(this.flux
-				.filter(s -> validate(s, getUser(session.getId())))
-				.map(this::transform)
-				.map(session::textMessage)
-				.log(getUser(session.getId()) +
-					"-outbound-wrap-as-websocket-message"))
-			.log(getUser(session.getId()) +
+	protected Mono<Void> doHandle(WebSocketSession session) {
+		return session.send(this.flux
+			.filter(s -> applicable(s, session))
+			.map(this::transform)
+			.map(session::textMessage)
+			.log(session.getId() +
+				"-outbound-wrap-as-websocket-message"))
+			.log(session.getId() +
 				"-outbound-publish-to-websocket");
 	}
 	// end::code-2[]
 
 	// tag::code-3[]
-	private boolean validate(Message<String> message, String user) {
+	private boolean applicable(Message<String> message, WebSocketSession user) {
 		if (message.getPayload().startsWith("@")) {
 			String targetUser = message.getPayload()
 				.substring(1, message.getPayload().indexOf(" "));
 
 			String sender = message.getHeaders()
 				.get(ChatServiceStreams.USER_HEADER, String.class);
+
+			String userName = user.getHandshakeInfo().getPrincipal().block().getName();
 			
-			return user.equals(sender) || user.equals(targetUser);
+			return userName.equals(sender) || userName.equals(targetUser);
 		} else {
 			return true;
 		}

@@ -31,29 +31,33 @@ import org.springframework.web.server.WebSession;
 @Configuration
 public class GatewayConfig {
 
-	private static final Logger log = LoggerFactory.getLogger(GatewayConfig.class);
-
-	@Bean
-	SaveSessionWebFilterFactory saveSessionWebFilterFactory() {
-		return new SaveSessionWebFilterFactory();
-	}
+	private static final Logger log =
+		LoggerFactory.getLogger(GatewayConfig.class);
 
 	/**
 	 * Force the current WebSession to get saved
 	 */
-	static class SaveSessionWebFilterFactory implements WebFilterFactory {
+	static class SaveSessionWebFilterFactory
+								implements WebFilterFactory {
 		@Override
 		public WebFilter apply(Tuple args) {
 			return (exchange, chain) -> exchange.getSession()
 				.map(webSession -> {
 					log.debug("Session id: " + webSession.getId());
-					webSession.getAttributes().entrySet().forEach(entry ->
-						log.debug(entry.getKey() + " => " + entry.getValue()));
+					webSession.getAttributes().entrySet()
+						.forEach(entry ->
+						log.debug(entry.getKey() + " => " +
+											entry.getValue()));
 					return webSession;
 				})
 				.map(WebSession::save)
 				.then(chain.filter(exchange));
 		}
+	}
+
+	@Bean
+	SaveSessionWebFilterFactory saveSessionWebFilterFactory() {
+		return new SaveSessionWebFilterFactory();
 	}
 }
 // end::code[]

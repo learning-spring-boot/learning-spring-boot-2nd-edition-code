@@ -13,35 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.greglturnquist.learningspringboot.images;
+package com.greglturnquist.learningspringboot.chat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Greg Turnquist
  */
-@Component
-public class InitDatabase {
+// tag::code[]
+@Configuration
+public class InitUsers {
+
 	@Bean
-	CommandLineRunner init(MongoOperations operations) {
+	CommandLineRunner initializeUsers(MongoOperations operations) {
 		return args -> {
-			// tag::log[]
-			operations.dropCollection(Image.class);
+			operations.dropCollection(User.class);
 
-			operations.insert(new Image("1",
-				"learning-spring-boot-cover.jpg", "greg"));
-			operations.insert(new Image("2",
-				"learning-spring-boot-2nd-edition-cover.jpg", "greg"));
-			operations.insert(new Image("3",
-				"bazinga.png", "phil"));
+			operations.insert(
+				new User(
+					null,
+					"greg", "turnquist",
+					new String[]{"ROLE_USER", "ROLE_ADMIN"}));
+			operations.insert(
+				new User(
+					null,
+					"phil", "webb",
+					new String[]{"ROLE_USER"}));
 
-			operations.findAll(Image.class).forEach(image -> {
-				System.out.println(image.toString());
+			operations.findAll(User.class).forEach(user -> {
+				System.out.println("Loaded " + user);
 			});
-			// end::log[]
 		};
 	}
 }
+// end::code[]

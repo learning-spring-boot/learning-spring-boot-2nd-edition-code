@@ -15,14 +15,12 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
-import org.springframework.context.annotation.Configuration;
 import org.springframework.session.data.mongo.config.annotation.web.reactive.EnableMongoWebSession;
 
 /**
  * @author Greg Turnquist
  */
 // tag::code[]
-@Configuration
 @EnableMongoWebSession
 public class SessionConfig {
 

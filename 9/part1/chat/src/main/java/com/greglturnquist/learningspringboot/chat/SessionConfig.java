@@ -15,8 +15,6 @@
  */
 package com.greglturnquist.learningspringboot.chat;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.session.data.mongo.JdkMongoSessionConverter;
 import org.springframework.session.data.mongo.config.annotation.web.reactive.EnableMongoWebSession;
 
 /**
@@ -26,9 +24,5 @@ import org.springframework.session.data.mongo.config.annotation.web.reactive.Ena
 @EnableMongoWebSession
 public class SessionConfig {
 
-	@Bean
-	JdkMongoSessionConverter mongoSessionConverter() {
-		return new JdkMongoSessionConverter();
-	}
 }
 // end::code[]
