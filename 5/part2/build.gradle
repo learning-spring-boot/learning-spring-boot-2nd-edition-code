@@ -27,6 +27,13 @@ jar {
 	baseName = 'learning-spring-boot'
 	version = '0.0.1-SNAPSHOT'
 }
+
+// tag::build-info[]
+springBoot {
+	buildInfo()
+}
+// end::build-info[]
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -36,6 +43,8 @@ repositories {
 	maven { url "https://repo.spring.io/milestone" }
 	maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
+
+ext['thymeleaf-spring5.version'] = '3.0.8-SNAPSHOT'
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')

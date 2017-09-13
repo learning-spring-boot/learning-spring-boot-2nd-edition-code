@@ -10,10 +10,10 @@ rootProject.name = 'learning-spring-boot'
 //
 //include '4/part1'
 //include '4/part2'
-//
-//include '5/part1'
-//include '5/part2'
-//
+
+include '5/part1'
+include '5/part2'
+
 //include '6/part1'
 //include '6/part2'
 //include '6/part3'
