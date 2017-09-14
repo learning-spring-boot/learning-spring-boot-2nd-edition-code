@@ -63,7 +63,7 @@ public class HomeController {
 				.findAllImages()
 				.flatMap(image ->
 					Mono.just(image)
-						.and(repository.findByImageId(
+						.zipWith(repository.findByImageId(
 							image.getId()).collectList()))
 				.map(imageAndComments -> new HashMap<String, Object>(){{
 					put("id", imageAndComments.getT1().getId());

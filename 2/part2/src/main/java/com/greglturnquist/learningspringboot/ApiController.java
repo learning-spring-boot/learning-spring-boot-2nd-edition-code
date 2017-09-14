@@ -40,7 +40,7 @@ public class ApiController {
 	// tag::get[]
 	@GetMapping(API_BASE_PATH + "/images")
 	Flux<Image> images() {
-		Hooks.onOperator(operatorHook -> operatorHook.operatorStacktrace());
+		Hooks.onOperatorDebug();
 
 		return Flux.just(
 			new Image(1, "learning-spring-boot-cover.jpg"),
@@ -53,7 +53,7 @@ public class ApiController {
 	// tag::post[]
 	@PostMapping(API_BASE_PATH + "/images")
 	Mono<Void> create(@RequestPart Flux<FilePart> images) {
-		Hooks.onOperator(operatorHook -> operatorHook.operatorStacktrace());
+		Hooks.onOperatorDebug();
 
 		return images
 			.map(image -> {

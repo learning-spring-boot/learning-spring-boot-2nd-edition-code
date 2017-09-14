@@ -15,13 +15,13 @@
  */
 package com.greglturnquist.learningspringboot;
 
-import org.junit.Test;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
+
+import org.junit.Test;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * @author Greg Turnquist
@@ -75,7 +75,7 @@ public class ExampleTests {
 			.flatMap(s -> Flux.fromArray(s.split("")))
 			.groupBy(String::toString)
 			.sort((o1, o2) -> o1.key().compareTo(o2.key()))
-			.flatMap(group -> Mono.just(group.key()).and(group.count()))
+			.flatMap(group -> Mono.just(group.key()).zipWith(group.count()))
 			.map(keyAndCount -> keyAndCount.getT1() + " => " + keyAndCount.getT2())
 			.subscribe(System.out::println);
 		// end::6[]
