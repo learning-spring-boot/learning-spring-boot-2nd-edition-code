@@ -18,6 +18,10 @@ package com.greglturnquist.learningspringboot;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 /**
  * @author Greg Turnquist
@@ -30,6 +34,14 @@ public class LearningSpringBootEurekaServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(
 			LearningSpringBootEurekaServerApplication.class);
+	}
+
+	@Bean
+	public UserDetailsService userDetailsService() throws Exception {
+		InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+		manager.createUser(User.withUsername("user").password("password")
+			.roles("USER").build());
+		return manager;
 	}
 }
 // end::code[]

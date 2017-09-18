@@ -7,9 +7,3 @@ spring:
       label: session
       password: password
 # end::secured-config-server[]
-
-# tag::secured[]
-security:
-  user:
-    password: password
-# tag::secured[]

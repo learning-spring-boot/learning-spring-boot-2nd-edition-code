@@ -1,7 +1,7 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.M4'
-		springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
+		springBootVersion = '2.0.0.M3'
+		springCloudVersion = 'Finchley.M2'
 	}
 	repositories {
 		mavenCentral()
@@ -39,7 +39,8 @@ jar {
 }
 
 dependencies {
-	compile('org.springframework.cloud:spring-cloud-starter-eureka-server')
+	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-server')
 
 	// tag::code[]
 	compile('org.springframework.cloud:spring-cloud-starter-config')

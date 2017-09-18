@@ -1,7 +1,7 @@
 buildscript {
 	ext {
 		springBootVersion = '2.0.0.M4'
-		springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
+		springCloudVersion = 'Finchley.M2'
 		springCloudStreamVersion = 'Elmhurst.M1'
 	}
 	repositories {
