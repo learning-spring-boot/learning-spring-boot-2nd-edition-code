@@ -23,6 +23,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -56,8 +58,10 @@ public class EndToEndTests {
 		assertThat(pageContent)
 			.contains("<a href=\"/images/bazinga.png/raw\">");
 
-		driver.findElement(
-			By.cssSelector("a[href*=\"bazinga.png\"]")).click();
+		WebElement element = driver.findElement(
+			By.cssSelector("a[href*=\"bazinga.png\"]"));
+		Actions actions = new Actions(driver);
+		actions.moveToElement(element).click().perform();
 
 		driver.navigate().back();
 	}

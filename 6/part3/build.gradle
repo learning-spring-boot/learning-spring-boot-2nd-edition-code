@@ -1,7 +1,7 @@
 // tag::spring-cloud[]
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+		springBootVersion = '2.0.0.M4'
 		springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
 	}
 	// end::spring-cloud[]
@@ -48,6 +48,8 @@ configurations {
 	all*.exclude group: 'org.springframework', module: 'spring-webmvc'
 }
 // end::exclude-tomcat[]
+
+ext['thymeleaf-spring5.version'] = '3.0.8-SNAPSHOT'
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')

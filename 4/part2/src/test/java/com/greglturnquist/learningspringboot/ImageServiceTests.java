@@ -54,9 +54,6 @@ public class ImageServiceTests {
 	ImageRepository repository;
 	// end::1[]
 
-	@MockBean
-	InitDatabase initDatabase;
-
 	@MockBean(name = "setUp")
 	Object ignoreImageServiceCommandLineRunner;
 

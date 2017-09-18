@@ -30,8 +30,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.interactions.Actions;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -91,8 +93,10 @@ public class EndToEndTests {
 		assertThat(pageContent)
 			.contains("<a href=\"/images/bazinga.png/raw\">");
 
-		driver.findElement(
-			By.cssSelector("a[href*=\"bazinga.png\"]")).click();
+		WebElement element = driver.findElement(
+			By.cssSelector("a[href*=\"bazinga.png\"]"));
+		Actions actions = new Actions(driver);
+		actions.moveToElement(element).click().perform();
 
 		takeScreenshot("homePageShouldWork-2");
 

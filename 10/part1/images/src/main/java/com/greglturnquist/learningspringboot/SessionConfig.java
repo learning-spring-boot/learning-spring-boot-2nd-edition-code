@@ -15,20 +15,14 @@
  */
 package com.greglturnquist.learningspringboot;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.session.data.mongo.JdkMongoSessionConverter;
-import org.springframework.session.data.mongo.config.annotation.web.http.EnableMongoHttpSession;
+import org.springframework.session.data.mongo.config.annotation.web.reactive.EnableMongoWebSession;
 
 /**
  * @author Greg Turnquist
  */
-@Configuration
-@EnableMongoHttpSession
+// tag::code[]
+@EnableMongoWebSession
 public class SessionConfig {
 
-	@Bean
-	public JdkMongoSessionConverter sessionConverter() {
-		return new JdkMongoSessionConverter();
-	}
 }
+// end::code[]

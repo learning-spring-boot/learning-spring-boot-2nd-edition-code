@@ -1,6 +1,6 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.M3'
+		springBootVersion = '2.0.0.M4'
 		springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
 	}
 	repositories {
@@ -43,8 +43,6 @@ configurations {
 	all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
 	all*.exclude group: 'org.springframework', module: 'spring-webmvc'
 }
-
-ext['reactor.version'] = '3.0.3.RELEASE'
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')

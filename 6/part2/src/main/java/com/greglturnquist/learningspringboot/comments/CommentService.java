@@ -15,13 +15,13 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
@@ -33,12 +33,12 @@ public class CommentService {
 
 	private final CommentWriterRepository repository;
 
-	private final CounterService counterService;
+	private final MeterRegistry meterRegistry;
 
 	public CommentService(CommentWriterRepository repository,
-						  CounterService counterService) {
+						  MeterRegistry meterRegistry) {
 		this.repository = repository;
-		this.counterService = counterService;
+		this.meterRegistry = meterRegistry;
 	}
 
 	// tag::code[]
@@ -52,10 +52,9 @@ public class CommentService {
 			.save(newComment)
 			.log("commentService-save")
 			.subscribe(comment -> {
-				counterService.increment(
-					"comments.total.consumed");
-				counterService.increment(
-					"comments." + newComment.getImageId() + ".consumed");
+				meterRegistry
+					.counter("comments.consumed", comment.getImageId())
+					.increment();
 			});
 	}
 	// end::code[]

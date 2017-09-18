@@ -2,15 +2,12 @@
 <!DOCTYPE html>
 <div xmlns:th="http://www.thymeleaf.org">
 
-    <h3 th:text="${page.number + 1} + ' of ' + ${page.totalPages}" />
-    <h4 th:text="${page.size} + ' item(s) per page'" />
-
     <table>
         <!-- end::images[] -->
 
         <thead>
         <tr>
-            <th>Id</th><th>Name</th><th>Image</th><th></th>
+            <th>Id</th><th>Name</th><th>Image</th><th></th><th>Owner</th><th>Comments</th>
         </tr>
         </thead>
         <tbody>
@@ -18,9 +15,15 @@
             <td th:text="${image.id}" />
             <td th:text="${image.name}" />
             <td><a th:href="@{'/images/' + ${image.name} + '/raw'}"><img th:src="@{'/images/' + ${image.name} + '/raw'}" class="thumbnail" /></a></td>
+            <!-- tag::delete[] -->
             <td>
-                <button th:id="'/images/' + ${image.name}" class="delete">Delete</button>
+                <button th:if="${#authorization.expr('hasRole(''ROLE_ADMIN'')') or #authorization.expr('''__${image.owner}__'' == authentication.name')}"
+                        th:id="'/images/' + ${image.name}" class="delete">Delete</button>
             </td>
+            <!-- end::delete[] -->
+            <!-- tag::owner[] -->
+            <td th:text="${image.owner}" />
+            <!-- end::owner[] -->
             <!-- tag::comments[] -->
             <td>
                 <ul th:id="'comments-' + ${image.id}">
@@ -35,11 +38,6 @@
         </tr>
         </tbody>
     </table>
-
-    <ul>
-        <li th:if="${prev}"><a th:href="@{/(size=${prev.pageSize},page=${prev.pageNumber})}">Previous</a></li>
-        <li th:if="${next}"><a th:href="@{/(size=${next.pageSize},page=${next.pageNumber})}">Next</a></li>
-    </ul>
 
     <p><input type="file" name="file" id="file" /></p>
     <p><button id="upload">Upload</button></p>

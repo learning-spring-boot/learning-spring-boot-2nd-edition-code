@@ -15,11 +15,10 @@
  */
 package com.greglturnquist.learningspringboot.images;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
-
-import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.cloud.stream.messaging.Source;
@@ -42,12 +41,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class CommentController {
 // end::rest-controller[]
 
-	private final CounterService counterService;
+	private final MeterRegistry meterRegistry;
 	private FluxSink<Message<Comment>> commentSink;
 	private Flux<Message<Comment>> flux;
 
-	public CommentController(CounterService counterService) {
-		this.counterService = counterService;
+	public CommentController(MeterRegistry meterRegistry) {
+		this.meterRegistry = meterRegistry;
 		this.flux = Flux.<Message<Comment>>create(
 			emitter -> this.commentSink = emitter,
 			FluxSink.OverflowStrategy.IGNORE)
@@ -69,10 +68,9 @@ public class CommentController {
 					return comment;
 				})
 				.flatMap(comment -> {
-					counterService.increment("comments.total.produced");
-					counterService.increment(
-						"comments." +
-							comment.getImageId() + ".produced");
+					meterRegistry
+						.counter("comments.produced", comment.getImageId())
+						.increment();
 					return Mono.just(ResponseEntity.noContent().build());
 				});
 		} else {

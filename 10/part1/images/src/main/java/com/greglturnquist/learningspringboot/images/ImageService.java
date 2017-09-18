@@ -20,21 +20,18 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.util.UUID;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.actuate.metrics.CounterService;
-import org.springframework.boot.actuate.metrics.GaugeService;
-import org.springframework.boot.actuate.metrics.repository.InMemoryMetricRepository;
-import org.springframework.boot.actuate.metrics.writer.Delta;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
@@ -51,22 +48,15 @@ public class ImageService {
 	private final ImageRepository imageRepository;
 
 	// tag::metric-1[]
-	private final CounterService counterService;
-	private final GaugeService gaugeService;
-	private final InMemoryMetricRepository inMemoryMetricRepository;
+	private final MeterRegistry meterRegistry;
 
 	public ImageService(ResourceLoader resourceLoader,
 						ImageRepository imageRepository,
-						CounterService counterService,
-						GaugeService gaugeService,
-						InMemoryMetricRepository
-							inMemoryMetricRepository) {
+						MeterRegistry meterRegistry) {
 
 		this.resourceLoader = resourceLoader;
 		this.imageRepository = imageRepository;
-		this.counterService = counterService;
-		this.gaugeService = gaugeService;
-		this.inMemoryMetricRepository = inMemoryMetricRepository;
+		this.meterRegistry = meterRegistry;
 	}
 // end::metric-1[]
 
@@ -84,7 +74,8 @@ public class ImageService {
 	}
 
 	// tag::metric-2[]
-	public Mono<Void> createImage(Flux<FilePart> files) {
+	public Mono<Void> createImage(Flux<FilePart> files,
+								  Principal auth) {
 		return files
 			.log("createImage-files")
 			.flatMap(file -> {
@@ -92,8 +83,9 @@ public class ImageService {
 					new Image(
 						UUID.randomUUID().toString(),
 						file.filename(),
-						SecurityContextHolder.getContext().getAuthentication().getName()))
+						auth.getName()))
 					.log("createImage-save");
+				// end::metric-2[]
 
 				Mono<Void> copyFile = Mono.just(Paths.get(UPLOAD_ROOT, file.filename()).toFile())
 					.log("createImage-picktarget")
@@ -110,14 +102,9 @@ public class ImageService {
 					.log("createImage-copy");
 
 				Mono<Void> countFile = Mono.fromRunnable(() -> {
-					counterService.increment("files.uploaded");
-
-					gaugeService.submit("files.uploaded.lastBytes",
-						file.headers().getContentLength());
-
-					inMemoryMetricRepository.increment(
-						new Delta<Number>("files.uploaded.totalBytes",
-							file.headers().getContentLength()));
+					meterRegistry
+						.summary("files.uploaded.bytes")
+						.record(file.headers().getContentLength());
 				});
 
 				return Mono.when(saveDatabaseImage, copyFile, countFile)
@@ -127,9 +114,13 @@ public class ImageService {
 			.then()
 			.log("createImage-done");
 	}
-	// end::metric-2[]
 
+	// tag::delete[]
+	@PreAuthorize("hasRole('ADMIN') or " +
+		"@imageRepository.findByName(#filename).owner " +
+		"== authentication.name")
 	public Mono<Void> deleteImage(String filename) {
+		// end::delete[]
 		Mono<Void> deleteDatabaseImage = imageRepository
 			.findByName(filename)
 			.log("deleteImage-find")

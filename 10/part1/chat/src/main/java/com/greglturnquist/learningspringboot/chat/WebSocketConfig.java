@@ -15,12 +15,21 @@
  */
 package com.greglturnquist.learningspringboot.chat;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.reactive.HandlerMapping;
+import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
+import org.springframework.web.reactive.socket.WebSocketHandler;
+import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter;
 
 /**
  * @author Greg Turnquist
@@ -34,8 +43,7 @@ public class WebSocketConfig {
 	@Profile("cloud")
 	@Configuration
 	@EnableConfigurationProperties(ChatConfigProperties.class)
-//	@EnableWebSocketMessageBroker
-	static class CloudBasedWebSocketConfig /*extends AbstractSecurityWebSocketMessageBrokerConfigurer*/ {
+	static class CloudBasedWebSocketConfig {
 	// end::cloud-1[]
 
 		private static final Logger log = LoggerFactory.getLogger(CloudBasedWebSocketConfig.class);
@@ -49,68 +57,64 @@ public class WebSocketConfig {
 		// end::cloud-2[]
 
 		// tag::cors[]
-//		@Override
-//		public void registerStompEndpoints(StompEndpointRegistry registry) {
-//			registry.addEndpoint("/learning-spring-boot")
-//				.setAllowedOrigins(chatConfigProperties.getOrigin())
-//				.withSockJS();
-//		}
+		@Bean
+		HandlerMapping webSocketMapping(CommentService commentService,
+										InboundChatService inboundChatService,
+										OutboundChatService outboundChatService) {
+			SimpleUrlHandlerMapping mapping =
+				configureUrlMappings(commentService, inboundChatService, outboundChatService);
+
+			Map<String, CorsConfiguration> corsConfigurationMap = new HashMap<>();
+			CorsConfiguration corsConfiguration = new CorsConfiguration();
+			corsConfiguration.addAllowedOrigin(chatConfigProperties.getOrigin());
+
+			mapping.getUrlMap().keySet().forEach(route ->
+				corsConfigurationMap.put(route, corsConfiguration)
+			);
+
+			mapping.setCorsConfigurations(corsConfigurationMap);
+
+			return mapping;
+		}
 		// end::cors[]
-
-//		@Override
-//		public void configureMessageBroker(MessageBrokerRegistry registry) {
-//			registry.setApplicationDestinationPrefixes("/app");
-//			registry.enableSimpleBroker("/topic", "/queue");
-//		}
-
-//		@Override
-//		protected void configureInbound(
-//			MessageSecurityMetadataSourceRegistry messages) {
-//
-//			configureMessageSecurity(messages);
-//		}
 	}
 
 	// tag::websocket-non-cloud[]
 	@Profile("!cloud")
 	@Configuration
-//	@EnableWebSocketMessageBroker
-	static class LocalWebSocketConfig /*extends AbstractSecurityWebSocketMessageBrokerConfigurer*/ {
+	static class LocalWebSocketConfig {
 	// end::websocket-non-cloud[]
 
-		private static final Logger log = LoggerFactory.getLogger(LocalWebSocketConfig.class);
-
-//		@Override
-//		public void registerStompEndpoints(StompEndpointRegistry registry) {
-//			registry.addEndpoint("/learning-spring-boot").withSockJS();
-//		}
-
-//		@Override
-//		public void configureMessageBroker(MessageBrokerRegistry registry) {
-//			registry.setApplicationDestinationPrefixes("/app");
-//			registry.enableSimpleBroker("/topic", "/queue");
-//		}
-
 		// tag::non-cloud-configure-inbound[]
-//		@Override
-//		protected void configureInbound(
-//			MessageSecurityMetadataSourceRegistry messages) {
-//
-//			configureMessageSecurity(messages);
-//		}
+		@Bean
+		HandlerMapping webSocketMapping(CommentService commentService,
+										InboundChatService inboundChatService,
+										OutboundChatService outboundChatService) {
+			return configureUrlMappings(commentService, inboundChatService, outboundChatService);
+		}
 		// end::non-cloud-configure-inbound[]
 	}
 
-	// tag::configure-message-security[]
-//	private static void configureMessageSecurity(
-//		MessageSecurityMetadataSourceRegistry messages) {
-//
-//		messages
-//			.nullDestMatcher().authenticated()
-//			.simpDestMatchers("/app/**").hasRole("USER")
-//			.simpSubscribeDestMatchers(
-//				"/user/**", "/topic/**").hasRole("USER")
-//			.anyMessage().denyAll();
-//	}
-	// end::configure-message-security[]
+
+	@Bean
+	WebSocketHandlerAdapter handlerAdapter() {
+		return new WebSocketHandlerAdapter();
+	}
+
+	// tag::url-mappings[]
+	private static SimpleUrlHandlerMapping configureUrlMappings(CommentService commentService,
+														 InboundChatService inboundChatService,
+														 OutboundChatService outboundChatService) {
+		Map<String, WebSocketHandler> urlMap = new HashMap<>();
+		urlMap.put("/topic/comments.new", commentService);
+		urlMap.put("/app/chatMessage.new", inboundChatService);
+		urlMap.put("/topic/chatMessage.new", outboundChatService);
+
+		SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
+		mapping.setOrder(10);
+		mapping.setUrlMap(urlMap);
+
+		return mapping;
+	}
+	// end::url-mappings[]
 }

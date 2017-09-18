@@ -15,31 +15,30 @@
  */
 package com.greglturnquist.learningspringboot;
 
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.HttpSecurity;
+import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.context.WebSessionSecurityContextRepository;
 
 /**
  * @author Greg Turnquist
  */
 // tag::code[]
-@Configuration
-//@EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfiguration /*extends
-					WebSecurityConfigurerAdapter*/ {
+@EnableWebFluxSecurity
+@EnableReactiveMethodSecurity
+public class SecurityConfiguration {
 
-//	@Override
-//	protected void configure(HttpSecurity http) throws Exception {
-//		http
-//			.httpBasic()
-//				.disable()
-//			.authorizeRequests()
-//				.anyRequest().authenticated()
-//				.and()
-//			.addFilterAfter(springSessionSecurityContextFilter,
-//				SessionManagementFilter.class);
-//	}
-//
-//	@Autowired
-//	SpringSessionSecurityContextFilter
-//		springSessionSecurityContextFilter;
+	@Bean
+	SecurityWebFilterChain springWebFilterChain() {
+		return HttpSecurity.http()
+			.securityContextRepository(
+				new WebSessionSecurityContextRepository())
+			.authorizeExchange()
+				.anyExchange().authenticated()
+				.and()
+			.build();
+	}
 }
 // end::code[]

@@ -15,11 +15,10 @@
  */
 package com.greglturnquist.learningspringboot.images;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
-
-import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.cloud.stream.messaging.Source;
@@ -30,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,12 +40,12 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableBinding(Source.class)
 public class CommentController {
 
-	private final CounterService counterService;
+	private final MeterRegistry meterRegistry;
 	private FluxSink<Message<Comment>> commentSink;
 	private Flux<Message<Comment>> flux;
 
-	public CommentController(CounterService counterService) {
-		this.counterService = counterService;
+	public CommentController(MeterRegistry meterRegistry) {
+		this.meterRegistry = meterRegistry;
 		this.flux = Flux.<Message<Comment>>create(
 			emitter -> this.commentSink = emitter,
 			FluxSink.OverflowStrategy.IGNORE)
@@ -53,11 +53,13 @@ public class CommentController {
 			.autoConnect();
 	}
 
+	@PreAuthorize("hasRole('USER')")
 	@PostMapping("/comments")
 	public Mono<ResponseEntity<?>> addComment(Mono<Comment> newComment) {
 		if (commentSink != null) {
 			return newComment
 				.map(comment -> {
+					System.out.println("Got " + comment);
 					commentSink.next(MessageBuilder
 						.withPayload(comment)
 						.setHeader(MessageHeaders.CONTENT_TYPE,
@@ -66,9 +68,9 @@ public class CommentController {
 					return comment;
 				})
 				.flatMap(comment -> {
-					counterService.increment("comments.total.produced");
-					counterService.increment(
-						"comments." + comment.getImageId() + ".produced");
+					meterRegistry
+						.counter("comments.produced", comment.getImageId())
+						.increment();
 					return Mono.just(ResponseEntity.noContent().build());
 				});
 		} else {

@@ -1,7 +1,8 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+		springBootVersion = '2.0.0.M4'
 		springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
+		springCloudStreamVersion = 'Elmhurst.M1'
 	}
 	repositories {
 		mavenCentral()
@@ -45,10 +46,7 @@ configurations {
 	all*.exclude group: 'org.springframework', module: 'spring-webmvc'
 }
 
-configurations {
-	all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
-	all*.exclude group: 'org.springframework', module: 'spring-webmvc'
-}
+ext['thymeleaf-spring5.version'] = '3.0.8-SNAPSHOT'
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')
@@ -65,13 +63,10 @@ dependencies {
 	compile('org.projectlombok:lombok')
 
 	// tag::spring-session[]
+	compile('org.springframework.security:spring-security-config')
 	compile('org.springframework.security:spring-security-webflux')
-	compile('org.springframework.session:spring-session-data-mongodb:2.0.0.BUILD-SNAPSHOT')
+	compile('org.springframework.session:spring-session-data-mongodb:2.0.0.M3')
 	// end::spring-session[]
-
-	// tag::thymeleaf-security[]
-	compile('org.thymeleaf.extras:thymeleaf-extras-springsecurity4:2.1.3.RELEASE')
-	// end::thymeleaf-security[]
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
@@ -79,5 +74,6 @@ dependencies {
 dependencyManagement {
 	imports {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+		mavenBom "org.springframework.cloud:spring-cloud-stream-dependencies:${springCloudStreamVersion}"
 	}
 }

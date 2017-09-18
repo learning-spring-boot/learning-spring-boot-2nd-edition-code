@@ -1,7 +1,7 @@
 buildscript {
 	// tag::versions[]
 	ext {
-		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+		springBootVersion = '2.0.0.M4'
 	}
 	// end::versions[]
 	repositories {
@@ -32,6 +32,8 @@ repositories {
 	maven { url "https://repo.spring.io/milestone" }
 	maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
+
+ext['thymeleaf-spring5.version'] = '3.0.8-SNAPSHOT'
 
 // tag::deps[]
 dependencies {

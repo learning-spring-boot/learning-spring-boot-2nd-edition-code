@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors.
+ * Copyright 2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,27 +15,30 @@
  */
 package com.greglturnquist.learningspringboot.chat;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.config.web.server.HttpSecurity;
-import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.cloud.stream.annotation.Input;
+import org.springframework.cloud.stream.annotation.Output;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.SubscribableChannel;
 
 /**
  * @author Greg Turnquist
  */
 // tag::code[]
-@EnableWebFluxSecurity
-public class SecurityConfiguration {
+public interface ChatServiceStreams {
 
-	// tag::security-filter-chain[]
-	@Bean
-	SecurityWebFilterChain springWebFilterChain(HttpSecurity http) {
-		return http
-			.authorizeExchange()
-			.pathMatchers("/**").authenticated()
-			.and()
-			.build();
-	}
-	// end::security-filter-chain[]
+	String NEW_COMMENTS = "newComments";
+	String CLIENT_TO_BROKER = "clientToBroker";
+	String BROKER_TO_CLIENT = "brokerToClient";
+
+	String USER_HEADER = "User";
+
+	@Input(NEW_COMMENTS)
+	SubscribableChannel newComments();
+
+	@Output(CLIENT_TO_BROKER)
+	MessageChannel clientToBroker();
+
+	@Input(BROKER_TO_CLIENT)
+	SubscribableChannel brokerToClient();
 }
 // end::code[]

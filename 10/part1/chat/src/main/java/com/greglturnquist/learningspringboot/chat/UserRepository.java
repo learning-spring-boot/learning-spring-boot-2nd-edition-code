@@ -15,14 +15,16 @@
  */
 package com.greglturnquist.learningspringboot.chat;
 
-import org.springframework.data.repository.CrudRepository;
+import reactor.core.publisher.Mono;
+import org.springframework.data.repository.Repository;
 
 /**
  * @author Greg Turnquist
  */
 // tag::code[]
-public interface UserRepository extends CrudRepository<User, String> {
+public interface UserRepository
+	extends Repository<User, String> {
 
-	User findByUsername(String username);
+	Mono<User> findByUsername(String username);
 }
 // end::code[]

@@ -15,10 +15,9 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import reactor.core.publisher.Mono;
-
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -31,12 +30,12 @@ public class CommentController {
 
 	private final RabbitTemplate rabbitTemplate;
 
-	private final CounterService counterService;
+	private final MeterRegistry meterRegistry;
 
 	public CommentController(RabbitTemplate rabbitTemplate,
-							 CounterService counterService) {
+							 MeterRegistry meterRegistry) {
 		this.rabbitTemplate = rabbitTemplate;
-		this.counterService = counterService;
+		this.meterRegistry = meterRegistry;
 	}
 
 	@PostMapping("/comments")
@@ -51,9 +50,9 @@ public class CommentController {
 			.then(Mono.just(comment)))
 			.log("commentService-publish")
 			.flatMap(comment -> {
-				counterService.increment("comments.total.produced");
-				counterService.increment(
-					"comments." + comment.getImageId() + ".produced");
+				meterRegistry
+					.counter("comments.produced", comment.getImageId())
+					.increment();
 				return Mono.just("redirect:/");
 			});
 	}

@@ -15,10 +15,9 @@
  */
 package com.greglturnquist.learningspringboot.comments;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import reactor.core.publisher.Flux;
-
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Input;
 import org.springframework.cloud.stream.annotation.Output;
@@ -38,12 +37,12 @@ public class CommentService {
 
 	private final CommentRepository repository;
 
-	private final CounterService counterService;
+	private final MeterRegistry meterRegistry;
 
 	public CommentService(CommentRepository repository,
-						  CounterService counterService) {
+						  MeterRegistry meterRegistry) {
 		this.repository = repository;
-		this.counterService = counterService;
+		this.meterRegistry = meterRegistry;
 	}
 
 	// tag::stream-2[]
@@ -53,10 +52,9 @@ public class CommentService {
 		return repository
 			.saveAll(newComment)
 			.map(comment -> {
-				counterService.increment(
-					"comments.total.consumed");
-				counterService.increment(
-					"comments." + comment.getImageId() + ".consumed");
+				meterRegistry
+					.counter("comments.consumed", comment.getImageId())
+					.increment();
 				return comment;
 			});
 	}
