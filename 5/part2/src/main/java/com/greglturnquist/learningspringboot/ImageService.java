@@ -94,15 +94,14 @@ public class ImageService {
 					})
 					.log("createImage-newfile")
 					.flatMap(file::transferTo)
-					.log("createImage-copy");
+					.log("createImage-copy")
+					.then(Mono.fromRunnable(() ->
+						meterRegistry
+							.summary("files.uploaded.bytes")
+							.record(Paths.get(UPLOAD_ROOT, file.filename()).toFile().length())
+					));
 
-				Mono<Void> countFile = Mono.fromRunnable(() -> {
-					meterRegistry
-						.summary("files.uploaded.bytes")
-						.record(file.headers().getContentLength());
-				});
-
-				return Mono.when(saveDatabaseImage, copyFile, countFile)
+				return Mono.when(saveDatabaseImage, copyFile)
 					.log("createImage-when");
 			})
 			.log("createImage-flatMap")
