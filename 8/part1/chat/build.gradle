@@ -1,7 +1,8 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.M4'
+		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
 		springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
+		springCloudStreamVersion = 'Elmhurst.M1'
 	}
 	repositories {
 		mavenCentral()
@@ -51,7 +52,7 @@ dependencies {
 	compile('org.projectlombok:lombok')
 	compile('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
 	compile('org.springframework.cloud:spring-cloud-stream-reactive')
-	compile('org.springframework.cloud:spring-cloud-starter-eureka')
+	compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
 	compile('org.springframework.cloud:spring-cloud-starter-config')
 	// end::websocket[]
 
@@ -61,5 +62,6 @@ dependencies {
 dependencyManagement {
 	imports {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+		mavenBom "org.springframework.cloud:spring-cloud-stream-dependencies:${springCloudStreamVersion}"
 	}
 }

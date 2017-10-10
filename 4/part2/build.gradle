@@ -1,6 +1,6 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.M4'
+		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
 	}
 	repositories {
 		mavenCentral()
@@ -32,8 +32,6 @@ repositories {
 }
 
 
-ext['thymeleaf-spring5.version'] = '3.0.8-SNAPSHOT'
-
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')
 	compile('org.synchronoss.cloud:nio-multipart-parser:1.1.0')
@@ -42,6 +40,7 @@ dependencies {
 	compile('org.projectlombok:lombok')
 
 	// tag::test-4[]
+	compile("org.seleniumhq.selenium:htmlunit-driver")
 	compile("org.seleniumhq.selenium:selenium-java")
 	// end::test-4[]
 

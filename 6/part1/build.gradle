@@ -1,6 +1,6 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.M4'
+		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
 	}
 	repositories {
 		mavenCentral()
@@ -37,8 +37,6 @@ repositories {
 	maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 	maven { url "https://dl.bintray.com/rabbitmq/maven-milestones/" }
 }
-
-ext['thymeleaf-spring5.version'] = '3.0.8-SNAPSHOT'
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')

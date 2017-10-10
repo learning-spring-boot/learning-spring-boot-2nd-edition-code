@@ -1,7 +1,8 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.M4'
+		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
 		springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
+		springCloudStreamVersion = 'Elmhurst.M1'
 	}
 	repositories {
 		mavenCentral()
@@ -45,8 +46,6 @@ configurations {
 	all*.exclude group: 'org.springframework', module: 'spring-webmvc'
 }
 
-ext['thymeleaf-spring5.version'] = '3.0.8-SNAPSHOT'
-
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')
 	compile('org.synchronoss.cloud:nio-multipart-parser:1.1.0')
@@ -58,8 +57,8 @@ dependencies {
 	compile('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
 	compile('org.springframework.cloud:spring-cloud-stream-reactive')
 	// tag::deps[]
-	compile('org.springframework.cloud:spring-cloud-starter-eureka')
-	compile('org.springframework.cloud:spring-cloud-starter-hystrix')
+	compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
+	compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
 	// end::deps[]
 
 	compile('org.projectlombok:lombok')
@@ -70,5 +69,6 @@ dependencies {
 dependencyManagement {
 	imports {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+		mavenBom "org.springframework.cloud:spring-cloud-stream-dependencies:${springCloudStreamVersion}"
 	}
 }

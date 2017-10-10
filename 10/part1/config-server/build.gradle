@@ -1,7 +1,7 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.M4'
-		springCloudVersion = 'Finchley.M2'
+		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+		springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
 	}
 	repositories {
 		mavenCentral()

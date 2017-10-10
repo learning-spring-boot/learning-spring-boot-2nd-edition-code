@@ -1,7 +1,7 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.M4'
-		springCloudVersion = 'Finchley.M2'
+		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+		springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
 		springCloudStreamVersion = 'Elmhurst.M1'
 	}
 	repositories {
@@ -52,14 +52,13 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-devtools')
 	compile('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
 	compile('org.springframework.cloud:spring-cloud-stream-reactive')
-	compile('org.springframework.cloud:spring-cloud-starter-eureka')
-	compile('org.springframework.cloud:spring-cloud-starter-hystrix')
+	compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
+	compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
 	compile('org.springframework.cloud:spring-cloud-starter-config')
 	compile('org.projectlombok:lombok')
 
-	compile('org.springframework.security:spring-security-config')
-	compile('org.springframework.security:spring-security-webflux')
-	compile('org.springframework.session:spring-session-data-mongodb:2.0.0.M3')
+	compile('org.springframework.boot:spring-boot-starter-security-reactive')
+	compile('org.springframework.session:spring-session-data-mongodb')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }

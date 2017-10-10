@@ -1,6 +1,6 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.M4'
+		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
 		springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
 		springCloudStreamVersion = 'Elmhurst.M1'
 	}
@@ -48,8 +48,6 @@ configurations {
 	all*.exclude group: 'org.springframework', module: 'spring-webmvc'
 }
 
-ext['thymeleaf-spring5.version'] = '3.0.8-SNAPSHOT'
-
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')
 	compile('org.synchronoss.cloud:nio-multipart-parser:1.1.0')
@@ -63,12 +61,11 @@ dependencies {
 	compile('org.springframework.cloud:spring-cloud-starter-hystrix')
 	compile('org.springframework.cloud:spring-cloud-starter-config')
 
-	compile('org.springframework.security:spring-security-config')
-	compile('org.springframework.security:spring-security-webflux')
+	compile('org.springframework.boot:spring-boot-starter-security-reactive')
 
 	compile('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
 
-	compile('org.springframework.session:spring-session-data-mongodb:2.0.0.M3')
+	compile('org.springframework.session:spring-session-data-mongodb')
 
 	// tag::zuul[]
 	compile('org.springframework.cloud:spring-cloud-starter-gateway')

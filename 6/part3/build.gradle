@@ -1,8 +1,9 @@
 // tag::spring-cloud[]
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.M4'
+		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
 		springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
+		springCloudStreamVersion = 'Elmhurst.M1'
 	}
 	// end::spring-cloud[]
 	repositories {
@@ -49,8 +50,6 @@ configurations {
 }
 // end::exclude-tomcat[]
 
-ext['thymeleaf-spring5.version'] = '3.0.8-SNAPSHOT'
-
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')
 	compile('org.synchronoss.cloud:nio-multipart-parser:1.0.2')
@@ -71,6 +70,7 @@ dependencies {
 dependencyManagement {
 	imports {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+		mavenBom "org.springframework.cloud:spring-cloud-stream-dependencies:${springCloudStreamVersion}"
 	}
 }
 // end::scst-2[]

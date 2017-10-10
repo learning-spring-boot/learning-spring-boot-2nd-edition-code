@@ -16,3 +16,4 @@ build
 .DS_Store
 upload-dir
 !**/templates/*
+out
