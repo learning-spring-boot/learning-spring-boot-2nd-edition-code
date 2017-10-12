@@ -37,11 +37,12 @@ public class LearningSpringBootConfigServer {
 	}
 
 	@Bean
-	public UserDetailsService userDetailsService() throws Exception {
-		InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-		manager.createUser(User.withUsername("user").password("password")
-			.roles("USER").build());
-		return manager;
+	UserDetailsService userDetailsService() {
+		return new InMemoryUserDetailsManager(
+			User
+				.withUsername("user")
+				.password("password")
+				.roles("USER").build());
 	}
 }
 // end::code[]
