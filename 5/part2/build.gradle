@@ -1,6 +1,6 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+		springBootVersion = '2.0.0.M5'
 	}
 	repositories {
 		mavenCentral()
@@ -56,7 +56,7 @@ dependencies {
 	}
 	compile('org.springframework.boot:spring-boot-starter-undertow')
 	// end::undertow[]
-	compile('org.synchronoss.cloud:nio-multipart-parser:1.1.0')
+	compile('org.synchronoss.cloud:nio-multipart-parser')
 
 	compile('org.projectlombok:lombok')
 

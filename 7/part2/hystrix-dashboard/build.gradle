@@ -1,7 +1,7 @@
 // tag::versions[]
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+		springBootVersion = '2.0.0.M5'
 		springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
 	}
 	// end::versions[]

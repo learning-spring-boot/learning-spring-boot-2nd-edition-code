@@ -1,7 +1,7 @@
 // tag::buildscript[]
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.BUILD-SNAPSHOT'
+		springBootVersion = '2.0.0.M5'
 	}
 	repositories {
 		mavenCentral()
