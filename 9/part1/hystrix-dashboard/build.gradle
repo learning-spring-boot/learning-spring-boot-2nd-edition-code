@@ -42,6 +42,7 @@ jar {
 dependencies {
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix-dashboard')
 	compile('org.springframework.cloud:spring-cloud-starter-config')
+	compile('org.yaml:snakeyaml')
 }
 
 dependencyManagement {
