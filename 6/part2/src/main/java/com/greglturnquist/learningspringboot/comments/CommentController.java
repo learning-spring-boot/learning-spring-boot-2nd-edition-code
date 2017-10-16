@@ -51,7 +51,7 @@ public class CommentController {
 			.log("commentService-publish")
 			.flatMap(comment -> {
 				meterRegistry
-					.counter("comments.produced", comment.getImageId())
+					.counter("comments.produced", "imageId", comment.getImageId())
 					.increment();
 				return Mono.just("redirect:/");
 			});

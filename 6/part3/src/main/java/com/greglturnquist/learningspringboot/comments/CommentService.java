@@ -32,7 +32,7 @@ import org.springframework.stereotype.Service;
  */
 // tag::stream-1[]
 @Service
-@EnableBinding(Processor.class)
+@EnableBinding(CustomProcessor.class)
 public class CommentService {
 	// end::stream-1[]
 
@@ -48,14 +48,14 @@ public class CommentService {
 
 	// tag::stream-2[]
 	@StreamListener
-	@Output(Processor.OUTPUT)
-	public Flux<Void> save(@Input(Processor.INPUT)
+	@Output(CustomProcessor.OUTPUT)
+	public Flux<Void> save(@Input(CustomProcessor.INPUT)
 						   Flux<Comment> newComments) {
 		return repository
 			.saveAll(newComments)
 			.flatMap(comment -> {
 				meterRegistry
-					.counter("comments.consumed", comment.getImageId())
+					.counter("comments.consumed", "imageId", comment.getImageId())
 					.increment();
 				return Mono.empty();
 			});

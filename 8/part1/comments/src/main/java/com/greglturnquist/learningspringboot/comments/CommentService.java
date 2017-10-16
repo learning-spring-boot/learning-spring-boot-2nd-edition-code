@@ -58,7 +58,7 @@ public class CommentService {
 			.map(comment -> {
 				log.info("Saving new comment " + comment);
 				meterRegistry
-					.counter("comments.consumed", comment.getImageId())
+					.counter("comments.consumed", "imageId", comment.getImageId())
 					.increment();
 				return comment;
 			});

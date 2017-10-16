@@ -17,11 +17,11 @@ package com.greglturnquist.learningspringboot.chat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.gateway.filter.factory.WebFilterFactory;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.factory.GatewayFilterFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.tuple.Tuple;
-import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebSession;
 
 /**
@@ -37,10 +37,10 @@ public class GatewayConfig {
 	/**
 	 * Force the current WebSession to get saved
 	 */
-	static class SaveSessionWebFilterFactory
-								implements WebFilterFactory {
+	static class SaveSessionGatewayFilterFactory
+								implements GatewayFilterFactory {
 		@Override
-		public WebFilter apply(Tuple args) {
+		public GatewayFilter apply(Tuple args) {
 			return (exchange, chain) -> exchange.getSession()
 				.map(webSession -> {
 					log.debug("Session id: " + webSession.getId());
@@ -56,8 +56,8 @@ public class GatewayConfig {
 	}
 
 	@Bean
-	SaveSessionWebFilterFactory saveSessionWebFilterFactory() {
-		return new SaveSessionWebFilterFactory();
+	SaveSessionGatewayFilterFactory saveSessionWebFilterFactory() {
+		return new SaveSessionGatewayFilterFactory();
 	}
 }
 // end::code[]

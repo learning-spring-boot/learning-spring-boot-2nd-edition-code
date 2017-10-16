@@ -53,7 +53,7 @@ public class CommentService {
 			.saveAll(newComment)
 			.map(comment -> {
 				meterRegistry
-					.counter("comments.consumed", comment.getImageId())
+					.counter("comments.consumed", "imageId", comment.getImageId())
 					.increment();
 				return comment;
 			});

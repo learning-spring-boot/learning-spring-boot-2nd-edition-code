@@ -53,7 +53,7 @@ public class CommentService {
 			.log("commentService-save")
 			.subscribe(comment -> {
 				meterRegistry
-					.counter("comments.consumed", comment.getImageId())
+					.counter("comments.consumed", "imageId", comment.getImageId())
 					.increment();
 			});
 	}

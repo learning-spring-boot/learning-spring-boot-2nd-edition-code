@@ -69,7 +69,7 @@ public class CommentController {
 				})
 				.flatMap(comment -> {
 					meterRegistry
-						.counter("comments.produced", comment.getImageId())
+						.counter("comments.produced", "imageId", comment.getImageId())
 						.increment();
 					return Mono.just(ResponseEntity.noContent().build());
 				});

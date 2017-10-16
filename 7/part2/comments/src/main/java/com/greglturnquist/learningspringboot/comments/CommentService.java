@@ -54,7 +54,7 @@ public class CommentService {
 			.saveAll(newComment)
 			.flatMap(comment -> {
 				meterRegistry
-					.counter("comments.consumed", comment.getImageId())
+					.counter("comments.consumed", "imageId", comment.getImageId())
 					.increment();
 				return Mono.empty();
 			});
