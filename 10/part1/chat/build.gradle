@@ -3,7 +3,7 @@ buildscript {
 	ext {
 		springBootVersion = '2.0.0.M5'
 		springCloudVersion = 'Finchley.BUILD-SNAPSHOT'
-		springCloudStreamVersion = 'Elmhurst.BUILD-SNAPSHOT'
+		springCloudStreamVersion = 'Elmhurst.M2'
 	}
 	repositories {
 		mavenCentral()
