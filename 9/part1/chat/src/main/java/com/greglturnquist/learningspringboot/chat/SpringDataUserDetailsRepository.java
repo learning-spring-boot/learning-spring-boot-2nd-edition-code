@@ -16,10 +16,9 @@
 package com.greglturnquist.learningspringboot.chat;
 
 import reactor.core.publisher.Mono;
-import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsRepository;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,7 +26,7 @@ import org.springframework.stereotype.Component;
  */
 // tag::code[]
 @Component
-public class SpringDataUserDetailsRepository implements UserDetailsRepository {
+public class SpringDataUserDetailsRepository implements ReactiveUserDetailsService {
 
 	private final UserRepository repository;
 
@@ -39,11 +38,11 @@ public class SpringDataUserDetailsRepository implements UserDetailsRepository {
 	@Override
 	public Mono<UserDetails> findByUsername(String username) {
 		return repository.findByUsername(username)
-			.map(user -> new User(
-				user.getUsername(),
-				user.getPassword(),
-				AuthorityUtils.createAuthorityList(user.getRoles())
-			));
+			.map(user -> User.withDefaultPasswordEncoder()
+				.username(user.getUsername())
+				.password(user.getPassword())
+				.authorities(user.getRoles())
+				.build());
 	}
 }
 // end::code[]

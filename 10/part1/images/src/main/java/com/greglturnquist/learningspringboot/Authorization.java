@@ -15,6 +15,8 @@
  */
 package com.greglturnquist.learningspringboot;
 
+import java.util.Map;
+
 import org.aopalliance.intercept.MethodInvocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,7 @@ import org.springframework.expression.ParseException;
 import org.springframework.security.access.expression.ExpressionUtils;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.util.SimpleMethodInvocation;
 
 /**
@@ -48,9 +51,9 @@ public class Authorization {
 
 	// tag::part2[]
 	public boolean expr(String accessExpression) {
-		Authentication authentication =
-			(Authentication) this.context.getExchange()
-								.getPrincipal().block();
+		Map<String, Object> sessionVars = (Map<String, Object>) this.context.getVariable("session");
+		SecurityContext securityContext = (SecurityContext) sessionVars.get("SPRING_SECURITY_CONTEXT");
+		Authentication authentication = securityContext.getAuthentication();
 
 		log.debug("Checking if user \"{}\" meets expr \"{}\".",
 			new Object[] {

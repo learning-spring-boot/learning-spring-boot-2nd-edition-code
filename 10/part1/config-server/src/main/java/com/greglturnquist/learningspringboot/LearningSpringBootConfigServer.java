@@ -39,8 +39,8 @@ public class LearningSpringBootConfigServer {
 	@Bean
 	UserDetailsService userDetailsService() {
 		return new InMemoryUserDetailsManager(
-			User
-				.withUsername("user")
+			User.withDefaultPasswordEncoder()
+				.username("user")
 				.password("password")
 				.roles("USER").build());
 	}

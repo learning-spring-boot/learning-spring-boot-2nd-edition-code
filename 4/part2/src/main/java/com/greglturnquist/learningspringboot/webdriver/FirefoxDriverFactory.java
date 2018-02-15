@@ -38,7 +38,7 @@ class FirefoxDriverFactory implements ObjectFactory<FirefoxDriver> {
 		if (properties.getFirefox().isEnabled()) {
 			try {
 				return new FirefoxDriver();
-			} catch (WebDriverException e) {
+			} catch (WebDriverException | IllegalStateException e) {
 				e.printStackTrace();
 				// swallow the exception
 			}

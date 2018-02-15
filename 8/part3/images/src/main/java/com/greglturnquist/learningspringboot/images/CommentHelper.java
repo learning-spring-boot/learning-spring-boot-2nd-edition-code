@@ -15,14 +15,15 @@
  */
 package com.greglturnquist.learningspringboot.images;
 
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Collections;
-import java.util.List;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
 /**
  * @author Greg Turnquist

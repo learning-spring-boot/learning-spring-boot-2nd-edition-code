@@ -1,8 +1,8 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.M5'
-		springCloudVersion = 'Finchley.M3'
-		springCloudStreamVersion = 'Elmhurst.M2'
+		springBootVersion = '2.0.0.RC1'
+		springCloudVersion = 'Finchley.M6'
+		springCloudStreamVersion = 'Elmhurst.M4'
 	}
 	repositories {
 		mavenCentral()
@@ -61,7 +61,7 @@ dependencies {
 	compile('org.projectlombok:lombok')
 
 	// tag::spring-session[]
-	compile('org.springframework.boot:spring-boot-starter-security-reactive')
+	compile('org.springframework.boot:spring-boot-starter-security')
 	compile('org.springframework.session:spring-session-data-mongodb')
 	// end::spring-session[]
 

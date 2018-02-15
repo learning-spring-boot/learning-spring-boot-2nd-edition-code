@@ -39,8 +39,8 @@ public class LearningSpringBootEurekaServerApplication {
 	@Bean
 	UserDetailsService userDetailsService() {
 		return new InMemoryUserDetailsManager(
-			User
-				.withUsername("user")
+			User.withDefaultPasswordEncoder()
+				.username("user")
 				.password("password")
 				.roles("USER").build());
 	}

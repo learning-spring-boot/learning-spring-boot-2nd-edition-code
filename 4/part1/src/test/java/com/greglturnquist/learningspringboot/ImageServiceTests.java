@@ -15,10 +15,6 @@
  */
 package com.greglturnquist.learningspringboot;
 
-import static org.assertj.core.api.Assertions.tuple;
-import static org.assertj.core.api.BDDAssertions.then;
-import static org.mockito.BDDMockito.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,18 +24,23 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.FileUrlResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.FileSystemUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.FileSystemUtils;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.mock;
 
 /**
  * @author Greg Turnquist
@@ -107,7 +108,7 @@ public class ImageServiceTests {
 			.expectNextMatches(resource -> {
 				then(resource.getDescription()).isEqualTo("URL [file:upload-dir/alpha.jpg]");
 				then(resource.exists()).isFalse();
-				then(resource.getClass()).isEqualTo(UrlResource.class);
+				then(resource.getClass()).isEqualTo(FileUrlResource.class);
 				return true;
 			})
 			.verifyComplete();
