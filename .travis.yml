@@ -1,9 +1,10 @@
 language: java
 jdk:
 - oraclejdk8
-before_install:
- - chmod +x gradlew
-script: ./gradlew clean build
 cache:
   directories:
   - $HOME/.gradle
+before_install:
+ - chmod +x gradlew
+sudo: false
+script: ./gradlew clean build
