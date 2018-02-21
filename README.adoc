@@ -1,0 +1,34 @@
+image:https://travis-ci.org/learning-spring-boot/learning-spring-boot-2nd-edition-code.svg?branch=master["Build Status", link="https://travis-ci.org/learning-spring-boot/learning-spring-boot-2nd-edition-code"]
+
+[IMPORTANT]
+.Viewing older versions of code
+====
+* https://github.com/learning-spring-boot/learning-spring-boot-2nd-edition-code/tree/published[Original code] released with the book
+* https://github.com/learning-spring-boot/learning-spring-boot-2nd-edition-code/tree/spring-boot-2.0.0.rc1[Spring Boot 2.0.0.RC1 code]
+====
+
+== Learning Spring Boot 2.0 2nd Edition
+
+image::http://greglturnquist.com/wp-content/uploads/2016/11/learning-spring-boot-2nd-ed-243x300.jpg[float="right"]
+
+NOTE: This code has been updated using the latest stable version of Spring Boot 2.0.0.
+
+This is a standing repo of the code for http://greglturnquist.com/books/learning-spring-boot[_Learning Spring Boot 2nd Edition_]. While the book explains how to use the gradle wrapper, the code here already has the gradle wrapper set up. That means that for http://gradle.org/[gradle-based] apps, you can immediately run them assuming you have Java installed on your box.
+
+CAUTION: No have Java? I suggest you download and install http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html[Java 8 Development Kit (JDK)]. The book is based on using Java 8 to build and run everything.
+
+While not evident when you read the book, each chapter has a progressive approach regarding code. At various phases through each chapter, new features are added. To snapshot that, I create a separate app (using numbering) in the relevant chapter. To see the final version of the app, simply jump to the last app.
+
+If you are looking for the details explaining each app, please https://www.packtpub.com/application-development/learning-spring-boot-20-second-edition[order a copy of the book].
+
+It may sound presumptuous, but I have high confidence in the fidelity of the code. I developed each version of each chapter's app inside my IDE and ran it repeatedly. Since I http://blog.greglturnquist.com/2014/05/asciidoc-springboot-packtpub-awesome-tool-chain.html[wrote the entire book using Asciidoctor], I simply imported the source code directly into the manuscript. The risk at hand is not importing some aspect of the app.
+
+Stay tuned. In the meantime, http://www.urbandictionary.com/define.php?term=share%20and%20enjoy[share and enjoy]!
+
+== Licensing
+
+The code in this project is licensed http://apache.org/licenses/LICENSE-2.0.txt[Apache License v2.0].
+
+== Contributions
+
+Please read the related link:CONTRIBUTING.adoc[CONTRIBUTING] document if you are interested in making contributions.

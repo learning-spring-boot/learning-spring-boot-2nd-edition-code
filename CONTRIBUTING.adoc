@@ -1,0 +1,25 @@
+== Want to contribute?
+
+I didn't think about contributions initially, because I am contributing the code to YOU, the reader. But since receiving a pull request on this latest-and-greatest, I figured I should lay out some guidelines.
+
+=== Surrender all rights to contributions
+
+To avoid sticky entanglements, you must agree to relinquish all rights on any code contributions you make. I prefer to have the code owned by one person, me.
+
+IMPORTANT: Any code contributions through pull requests and suggestions by discussion would be implicitly viewed as your agreement to surrender all rights to that code.
+
+Any submitted code will be considered a best effort on your part as being yours to contribute. I am not here to do the background check on patches.
+
+=== Read the license
+
+All code on this project is licensed http://apache.org/licenses/LICENSE-2.0.txt[Apache License v2.0]. Read it and understand it. If you cannot comply with the requirements set forth in this document as well as the license, you are free to fork this project and do your own thing.
+
+=== Styling
+
+In general, I have written this code using the same formatting and coding styles that I use for http://projects.spring.io/spring-data[Spring Data]. I won't go into the details of that, but don't be surprised if I make a lot of comments on PRs. If you wish for your work to be accepted, entertain the possibility of having to make edits to your work, and that there might be post-merge polishing as well. Don't take it as an offense, but instead, opportunity to enjoy the project of juergenization!
+
+=== Updates
+
+Over time, this document may update. Stay tuned.
+
+Cheers!
