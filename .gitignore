@@ -17,3 +17,4 @@ build
 upload-dir
 !**/templates/*
 out
+!gradle/wrapper/*.jar
