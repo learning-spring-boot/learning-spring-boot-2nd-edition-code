@@ -5,6 +5,7 @@ image:https://travis-ci.org/learning-spring-boot/learning-spring-boot-2nd-editio
 ====
 * https://github.com/learning-spring-boot/learning-spring-boot-2nd-edition-code/tree/published[Original code] released with the book
 * https://github.com/learning-spring-boot/learning-spring-boot-2nd-edition-code/tree/spring-boot-2.0.0.rc1[Spring Boot 2.0.0.RC1 code]
+* https://github.com/learning-spring-boot/learning-spring-boot-2nd-edition-code/tree/spring-boot-2.0.0.rc2[Spring Boot 2.0.0.RC2 code]
 ====
 
 == Learning Spring Boot 2.0 2nd Edition

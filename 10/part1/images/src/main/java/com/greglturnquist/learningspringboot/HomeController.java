@@ -23,8 +23,8 @@ import reactor.core.publisher.Mono;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.server.WebSession;
 
 import com.greglturnquist.learningspringboot.images.CommentHelper;
 import com.greglturnquist.learningspringboot.images.ImageService;
@@ -49,7 +49,7 @@ public class HomeController {
 
 	@GetMapping("/")
 	public Mono<String> index(Model model,
-				  @RequestHeader("SESSION") String sessionId) {
+							  WebSession webSession) {
 		// tag::owner[]
 		model.addAttribute("images",
 			imageService
@@ -58,7 +58,9 @@ public class HomeController {
 					put("id", image.getId());
 					put("name", image.getName());
 					put("owner", image.getOwner());
-					put("comments", commentHelper.getComments(image, sessionId));
+					put("comments",
+						commentHelper.getComments(image,
+							webSession.getId()));
 				}})
 		);
 		// end::owner[]
@@ -67,7 +69,7 @@ public class HomeController {
 
 	@GetMapping("/token")
 	@ResponseBody
-	public Mono<Map<String, String>> token(@RequestHeader("SESSION") String sessionId) {
-		return Mono.just(Collections.singletonMap("token", sessionId));
+	public Mono<Map<String, String>> token(WebSession webSession) {
+		return Mono.just(Collections.singletonMap("token", webSession.getId()));
 	}
 }
