@@ -8,5 +8,7 @@ cache:
   - $HOME/.gradle
 before_install:
  - chmod +x gradlew
-sudo: false
+sudo: required
+addons:
+  chrome: stable
 script: ./gradlew clean build
