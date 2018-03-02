@@ -1,8 +1,8 @@
 // tag::versions[]
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.RC2'
-		springCloudVersion = 'Finchley.M7'
+		springBootVersion = '2.0.0.RELEASE'
+		springCloudVersion = 'Finchley.M8'
 	}
 	// end::versions[]
 	repositories {

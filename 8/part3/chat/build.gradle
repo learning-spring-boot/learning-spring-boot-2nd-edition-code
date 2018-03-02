@@ -1,8 +1,8 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.RC2'
-		springCloudVersion = 'Finchley.M7'
-		springCloudStreamVersion = 'Elmhurst.RC1'
+		springBootVersion = '2.0.0.RELEASE'
+		springCloudVersion = 'Finchley.M8'
+		springCloudStreamVersion = 'Elmhurst.RC2'
 	}
 	repositories {
 		mavenCentral()
