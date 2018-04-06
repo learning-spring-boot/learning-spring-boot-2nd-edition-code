@@ -1,9 +1,9 @@
 // tag::spring-cloud[]
 buildscript {
 	ext {
-		springBootVersion = '2.0.0.RELEASE'
-		springCloudVersion = 'Finchley.M8'
-		springCloudStreamVersion = 'Elmhurst.RC2'
+		springBootVersion = '2.0.1.RELEASE'
+		springCloudVersion = 'Finchley.M9'
+		springCloudStreamVersion = 'Elmhurst.RELEASE'
 	}
 	// end::spring-cloud[]
 	repositories {

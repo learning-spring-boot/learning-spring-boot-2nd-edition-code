@@ -1,7 +1,7 @@
 buildscript {
 	// tag::versions[]
 	ext {
-		springBootVersion = '2.0.0.RELEASE'
+		springBootVersion = '2.0.1.RELEASE'
 	}
 	// end::versions[]
 	repositories {
